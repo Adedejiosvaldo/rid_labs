@@ -19,6 +19,8 @@ model Doctor {
   specialty String
   phoneNumber String
   email     String   @unique
+    password String
+
   appointments Appointment[]
 }
 
@@ -28,6 +30,7 @@ model PetOwner {
   phoneNumber String
   email     String   @unique
   pets     Pet[]
+  password String
   Appointment Appointment[]
 }
 

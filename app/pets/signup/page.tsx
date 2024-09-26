@@ -14,7 +14,8 @@ import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
 type IssueForm = z.infer<typeof LoginSchema>;
 import { zodResolver } from "@hookform/resolvers/zod";
-const Pets = () => {
+
+const PetOwnerSignUp = () => {
   const {
     register,
     control,
@@ -35,7 +36,7 @@ const Pets = () => {
   const { theme } = useTheme();
   const calloutColor = theme === "dark" ? "gray" : "red";
 
-  const handleCreatePet = async (data: IssueForm) => {
+  const LoginUser = async (data: IssueForm) => {
     setIsLoading(true);
     try {
       const response = await fetch("/api/owners/signin", {
@@ -70,15 +71,14 @@ const Pets = () => {
               <MdError />
             </Callout.Icon>
             <Callout.Text className="font-medium">
-              Only Pet Owners Are to Login Here .
+              Only Pet Owners Can Create Account Here .
             </Callout.Text>
           </Callout.Root>
         </div>
       </section>
       <div className="container mx-auto p-6 md:p-6 lg:p-8 m-auto">
         <div className="flex  justify-center  flex-col flex-wrap md:flex-nowrap gap-4">
-          <form onSubmit={handleSubmit(handleCreatePet)}>
-            {" "}
+          <form onSubmit={handleSubmit(LoginUser)}>
             <Input
               {...register("email")}
               isRequired
@@ -86,6 +86,8 @@ const Pets = () => {
               label="Email"
               color="default"
               variant="bordered"
+              isInvalid={Boolean(errors.email)}
+              errorMessage={errors.email?.message}
               //   value={email}
               //   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               //     setEmail(e.target.value)
@@ -93,16 +95,14 @@ const Pets = () => {
               isClearable
               description="We'll never share your email with anyone else."
             />
-            {errors.email && (
-              <p className="text-red-500 mt-2 mb-2 font-medium text-sm">
-                {errors.email.message}
-              </p>
-            )}
+
             <Input
               {...register("password")}
               label="Password"
               color="default"
               variant="bordered"
+              isInvalid={Boolean(errors.password)}
+              errorMessage={errors.password?.message}
               //   value={password}
               endContent={
                 <button
@@ -119,7 +119,7 @@ const Pets = () => {
                 </button>
               }
               type={isVisible ? "text" : "password"}
-              className="border-11 mt-2 border-s-orange-400 flex items-center justify-center"
+              className="border-11 mt-2 border-s-orange-400 flex justify-center"
             />
             {errors.password && (
               <p className="text-red-500 mt-2  font-medium text-sm">
@@ -177,4 +177,4 @@ const Pets = () => {
   );
 };
 
-export default Pets;
+export default PetOwnerSignUp;
