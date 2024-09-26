@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Doctor {
+  id       String   @id @default(cuid()) @map("_id")
+  name     String
+  specialty String
+  phoneNumber String
+  email     String   @unique
+  appointments Appointment[]
+}
+
+model PetOwner {
+  id       String   @id @default(cuid()) @map("_id")
+  name     String
+  phoneNumber String
+  email     String   @unique
+  pets     Pet[]
+  Appointment Appointment[]
+}
+
+model Vet {
+  id       String   @id @default(cuid()) @map("_id")
+  name     String
+  specialty String
+  phoneNumber String
+  email     String   @unique
+}
+
+model Appointment {
+  id       String   @id @default(cuid()) @map("_id")
+  date     DateTime
+  time     DateTime
+  reason    String
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId  String
+  petOwner  PetOwner @relation(fields: [petOwnerId], references: [id])
+  petOwnerId String
+}
+
+model Pet {
+  id       String   @id @default(cuid()) @map("_id")
+  name     String
+  species  String
+  breed    String
+  age      Int
+  owner    PetOwner @relation(fields: [ownerId], references: [id])
+  ownerId  String
+  vaccinations Vaccination[]
+}
+
+model Vaccination {
+  id       String   @id @default(cuid()) @map("_id")
+  name     String
+  date     DateTime
+  pet      Pet   @relation(fields: [petId], references: [id])
+  petId    String
+}
