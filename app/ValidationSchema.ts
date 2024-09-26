@@ -32,4 +32,4 @@ const RegisterSchema = z.object({
     .min(1, "Phone number is required")
     .max(255, "Phone number must be less than 255 characters"),
 });
-export default LoginSchema;
+export { LoginSchema, RegisterSchema };

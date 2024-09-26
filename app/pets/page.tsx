@@ -1,5 +1,6 @@
 "use client";
 import { SetStateAction, useState } from "react";
+import { signIn } from "next-auth/react";
 import { Input, Modal } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { FaEye } from "react-icons/fa6";
@@ -7,14 +8,17 @@ import { FaEyeSlash } from "react-icons/fa6";
 import { subtitle, title } from "@/components/primitives";
 import Link from "next/link";
 import { z } from "zod";
-import LoginSchema from "@/app/ValidationSchema";
+import { LoginSchema } from "@/app/ValidationSchema";
 import { Callout } from "@radix-ui/themes";
 import { MdError } from "react-icons/md";
 import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
 type IssueForm = z.infer<typeof LoginSchema>;
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 const Pets = () => {
+  const router = useRouter();
+
   const {
     register,
     control,
@@ -38,22 +42,17 @@ const Pets = () => {
   const handleCreatePet = async (data: IssueForm) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/owners/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data), // Use the 'data' received from the form
+      const response = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error:", errorData); // Log the error data
-        return; // Exit if the response is not OK
+      console.log({ response });
+      if (!response?.error) {
+        router.push("/dashboard/owners");
+        router.refresh();
       }
-
-      const responseData = await response.json();
-      console.log("Pet created successfully:", responseData);
     } catch (error) {
       console.error("Error creating pet:", error);
     } finally {
@@ -86,11 +85,10 @@ const Pets = () => {
               label="Email"
               color="default"
               variant="bordered"
-              //   value={email}
-              //   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              //     setEmail(e.target.value)
-              //   }
+              isInvalid={Boolean(errors.email)}
+              errorMessage={errors.email?.message}
               isClearable
+              className=""
               description="We'll never share your email with anyone else."
             />
             {errors.email && (
@@ -103,6 +101,8 @@ const Pets = () => {
               label="Password"
               color="default"
               variant="bordered"
+              isInvalid={Boolean(errors.password)}
+              errorMessage={errors.password?.message}
               //   value={password}
               endContent={
                 <button
@@ -160,15 +160,11 @@ const Pets = () => {
             </div>
           </form>
         </div>
-
-        <div
-          className="
-                        flex flex-col items-center justify-center"
-        >
-          <h3 className="text-sm mt-8 font-light text-center text-white">
-            Dont Have an Account Yet ?
-            <span className=" ml-2 text-md font-medium text-center text-white hover:underline">
-              <Link href={"/pets/signup "}>Sign Up</Link>
+        <div className="flex flex-col items-center justify-center">
+          <h3 className="dark:text-sm mt-8 font-light text-center text-white white:text-black">
+            Don't Have an Account Yet?
+            <span className="ml-2 text-md font-medium text-white hover:underline dark:text-black">
+              <Link href="/pets/signup">Sign Up</Link>
             </span>
           </h3>
         </div>

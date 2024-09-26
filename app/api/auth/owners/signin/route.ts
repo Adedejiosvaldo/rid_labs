@@ -1,4 +1,4 @@
-import LoginSchema from "@/app/ValidationSchema";
+import { LoginSchema } from "@/app/ValidationSchema";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -10,5 +10,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(validator.error.errors, { status: 400 });
   }
 
-  return NextResponse.json({ message: "Registered" }, { status: 200 }); 
+  return NextResponse.json({ message: "Registered" }, { status: 200 });
 }
