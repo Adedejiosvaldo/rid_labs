@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 type IssueForm = z.infer<typeof LoginSchema>;
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { getServerSession } from 'next-auth';
 const Pets = () => {
   const router = useRouter();
 
@@ -27,6 +28,7 @@ const Pets = () => {
   } = useForm<IssueForm>({
     resolver: zodResolver(LoginSchema),
   });
+
   const [isLoading, setIsLoading] = useState(false);
   const [signInVisible, setSignInVisible] = useState(false);
   const [petType, setPetType] = useState("");

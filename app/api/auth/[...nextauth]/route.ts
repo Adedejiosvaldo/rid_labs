@@ -16,11 +16,27 @@ const handler = NextAuth({
         password: {},
       },
       async authorize(credentials, req) {
+        const callbackUrl = req.body?.callbackUrl;
+
+        console.log({ credentials, req });
         // Fetch the user from the database using Prisma
-        console.log({ credentials });
-        const user = await prisma.petOwner.findUnique({
-          where: { email: credentials?.email },
-        });
+        // const user = await prisma.petOwner.findUnique({
+        //   where: { email: credentials?.email },
+        // });
+
+        let user = null;
+
+        if (callbackUrl.includes("/pets")) {
+          // Check the database type for the /pets URL
+          user = await prisma.petOwner.findUnique({
+            where: { email: credentials?.email },
+          });
+        } else {
+          // Check the database type for other URLs
+          user = await prisma.doctor.findUnique({
+            where: { email: credentials?.email },
+          });
+        }
 
         // If user not found, return null
         if (!user) {
@@ -32,8 +48,6 @@ const handler = NextAuth({
           credentials?.password || "",
           user.password
         );
-
-        console.log({ passwordCorrect });
 
         // If the password is correct, return the user object
         if (passwordCorrect) {
