@@ -40,6 +40,7 @@ const handler = NextAuth({
 
         // If user not found, return null
         if (!user) {
+          throw new Error("User not found");
           return null;
         }
 
@@ -54,6 +55,7 @@ const handler = NextAuth({
           return {
             id: user.id,
             email: user.email,
+            role: user.role,
           };
         }
 

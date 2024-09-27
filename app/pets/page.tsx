@@ -16,7 +16,9 @@ import { useForm } from "react-hook-form";
 type IssueForm = z.infer<typeof LoginSchema>;
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { getServerSession } from 'next-auth';
+import { getServerSession } from "next-auth";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const Pets = () => {
   const router = useRouter();
 
@@ -52,11 +54,15 @@ const Pets = () => {
 
       console.log({ response });
       if (!response?.error) {
+        toast.success("Login Successful");
         router.push("/dashboard/owners");
         router.refresh();
+      } else {
+        toast.error(response.error);
       }
     } catch (error) {
       console.error("Error creating pet:", error);
+      toast.error("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -171,6 +177,19 @@ const Pets = () => {
           </h3>
         </div>
       </div>
+
+      <ToastContainer
+        position="bottom-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </>
   );
 };

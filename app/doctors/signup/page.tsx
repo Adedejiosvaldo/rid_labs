@@ -7,15 +7,15 @@ import { FaEyeSlash } from "react-icons/fa6";
 import { subtitle, title } from "@/components/primitives";
 import Link from "next/link";
 import { z } from "zod";
-import { RegisterSchema } from "@/app/ValidationSchema";
+import { RegisterSchemaDoctors } from "@/app/ValidationSchema";
 import { Callout } from "@radix-ui/themes";
 import { MdError } from "react-icons/md";
 import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
-type RegForm = z.infer<typeof RegisterSchema>;
+type RegForm = z.infer<typeof RegisterSchemaDoctors>;
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 const PetOwnerSignUp = () => {
   const {
@@ -24,7 +24,7 @@ const PetOwnerSignUp = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<RegForm>({
-    resolver: zodResolver(RegisterSchema),
+    resolver: zodResolver(RegisterSchemaDoctors),
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,7 +38,7 @@ const PetOwnerSignUp = () => {
   const LoginUser = async (data: RegForm) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/owners/signup", {
+      const response = await fetch("/api/auth/doctors/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,15 +48,18 @@ const PetOwnerSignUp = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        toast.error(errorData.message); // Display error message using toastify
+
         console.error("Error:", errorData); // Log the error data
         return; // Exit if the response is not OK
       }
 
       const responseData = await response.json();
-
+      toast.success("Registered Successfully");
       router.push("/pets");
       router.refresh();
     } catch (error) {
+      toast.error("An unexpected error occurred"); // Display error message using toastify
       console.error("Error creating pet:", error);
     } finally {
       setIsLoading(false);
@@ -105,18 +108,6 @@ const PetOwnerSignUp = () => {
               isClearable
               className="border-11 border-s-orange-400 flex  mb-5 justify-center"
               description="We'll never share your email with anyone else."
-            />
-
-            <Input
-              {...register("phoneNumber")}
-              label="Phone Number"
-              color="default"
-              variant="bordered"
-              isInvalid={Boolean(errors.phoneNumber)}
-              errorMessage={errors.phoneNumber?.message}
-              //   value={password}
-              type="tel"
-              className="border-11 border-s-orange-400 flex  mb-5 justify-center"
             />
 
             <Input
@@ -186,7 +177,7 @@ const PetOwnerSignUp = () => {
           <h3 className="text-sm mt-8 font-light text-center text-white">
             Already Have an Account?
             <span className=" ml-2 text-md font-medium text-center text-white hover:underline">
-              <Link href={"/pets "}>Login</Link>
+              <Link href={"/doctors "}>Login</Link>
             </span>
           </h3>
         </div>

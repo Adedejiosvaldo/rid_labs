@@ -14,60 +14,60 @@ datasource db {
 }
 
 model Doctor {
-  id       String   @id @default(cuid()) @map("_id")
-  name     String
-  specialty String
-  phoneNumber String
-  email     String   @unique
-    password String
-
+  id          String @id @default(cuid()) @map("_id")
+  name        String
+  email       String @unique
+  password    String
+  role        String @default("doctor")
   appointments Appointment[]
 }
 
 model PetOwner {
-  id       String   @id @default(cuid()) @map("_id")
-  name     String
+  id          String @id @default(cuid()) @map("_id")
+  name        String
   phoneNumber String
-  email     String   @unique
-  pets     Pet[]
-  password String
+  email       String @unique
+  pets        Pet[]
+  password    String
+  role        String @default("user")
+
   Appointment Appointment[]
 }
 
 model Vet {
-  id       String   @id @default(cuid()) @map("_id")
-  name     String
-  specialty String
+  id          String @id @default(cuid()) @map("_id")
+  name        String
+  specialty   String
   phoneNumber String
-  email     String   @unique
+  email       String @unique
 }
 
 model Appointment {
-  id       String   @id @default(cuid()) @map("_id")
-  date     DateTime
-  time     DateTime
-  reason    String
-  doctor    Doctor   @relation(fields: [doctorId], references: [id])
-  doctorId  String
-  petOwner  PetOwner @relation(fields: [petOwnerId], references: [id])
+  id         String   @id @default(cuid()) @map("_id")
+  date       DateTime
+  time       DateTime
+  reason     String
+  doctor     Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId   String
+  petOwner   PetOwner @relation(fields: [petOwnerId], references: [id])
   petOwnerId String
 }
 
 model Pet {
-  id       String   @id @default(cuid()) @map("_id")
-  name     String
-  species  String
-  breed    String
-  age      Int
-  owner    PetOwner @relation(fields: [ownerId], references: [id])
-  ownerId  String
+  id           String        @id @default(cuid()) @map("_id")
+  name         String
+  species      String
+  breed        String
+  age          Int
+  owner        PetOwner      @relation(fields: [ownerId], references: [id])
+  ownerId      String
   vaccinations Vaccination[]
 }
 
 model Vaccination {
-  id       String   @id @default(cuid()) @map("_id")
-  name     String
-  date     DateTime
-  pet      Pet   @relation(fields: [petId], references: [id])
-  petId    String
+  id    String   @id @default(cuid()) @map("_id")
+  name  String
+  date  DateTime
+  pet   Pet      @relation(fields: [petId], references: [id])
+  petId String
 }
