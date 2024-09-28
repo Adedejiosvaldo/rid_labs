@@ -1,5 +1,6 @@
 "use client";
 import { SetStateAction, useState } from "react";
+import { signIn } from "next-auth/react";
 import { Input, Modal } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { FaEye } from "react-icons/fa6";
@@ -7,95 +8,86 @@ import { FaEyeSlash } from "react-icons/fa6";
 import { subtitle, title } from "@/components/primitives";
 import Link from "next/link";
 import { z } from "zod";
-import { RegisterSchemaDoctors } from "@/app/ValidationSchema";
+import { LoginSchemaDoctors } from "@/app/ValidationSchema";
 import { Callout } from "@radix-ui/themes";
 import { MdError } from "react-icons/md";
 import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
-type RegForm = z.infer<typeof RegisterSchemaDoctors>;
+type IssueForm = z.infer<typeof LoginSchemaDoctors>;
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { getServerSession } from "next-auth";
 import { toast, ToastContainer } from "react-toastify";
 
-const PetOwnerSignUp = () => {
+const Doctors = async () => {
+  const router = useRouter();
+  const session = await getServerSession();
+  console.log({ session });
   const {
     register,
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegForm>({
-    resolver: zodResolver(RegisterSchemaDoctors),
+  } = useForm<IssueForm>({
+    resolver: zodResolver(LoginSchemaDoctors),
   });
+
   const [isLoading, setIsLoading] = useState(false);
+  const [signInVisible, setSignInVisible] = useState(false);
+  const [petType, setPetType] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const [isVisible, setIsVisible] = useState(false);
-  const router = useRouter();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   const { theme } = useTheme();
   const calloutColor = theme === "dark" ? "gray" : "red";
 
-  const LoginUser = async (data: RegForm) => {
+  const handleCreatePet = async (data: IssueForm) => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/doctors/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      const response = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message); // Display error message using toastify
-
-        console.error("Error:", errorData); // Log the error data
-        return; // Exit if the response is not OK
+      console.log({ response });
+      if (!response?.error) {
+        router.push("/dashboard/doctor");
+        router.refresh();
+      } else {
+        toast.error(response.error);
       }
-
-      const responseData = await response.json();
-      toast.success("Registered Successfully");
-      router.push("/doctors");
-      router.refresh();
     } catch (error) {
-      toast.error("An unexpected error occurred"); // Display error message using toastify
       console.error("Error creating pet:", error);
+      toast.error("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
   };
-
+  if (session) {
+    redirect("/dashboard/doctors");
+  }
   return (
     <>
-      <section className="flex flex-col items-center justify-center py-8 md:py-10">
+      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="inline-block max-w-xl text-center justify-center">
           <Callout.Root variant="outline" color={calloutColor}>
             <Callout.Icon>
               <MdError />
             </Callout.Icon>
             <Callout.Text className="font-medium">
-              Only Pet Owners Can Create Account Here .
+              Only Rid Vet Doctors Are to Login Here .
             </Callout.Text>
           </Callout.Root>
         </div>
       </section>
       <div className="container mx-auto p-6 md:p-6 lg:p-8 m-auto">
         <div className="flex  justify-center  flex-col flex-wrap md:flex-nowrap gap-4">
-          <form onSubmit={handleSubmit(LoginUser)}>
-            <Input
-              {...register("name")}
-              isRequired
-              type="text"
-              label="Name"
-              color="default"
-              variant="bordered"
-              isInvalid={Boolean(errors.name)}
-              errorMessage={errors.name?.message}
-              isClearable
-              className="border-11 border-s-orange-400 flex  mb-5 justify-center"
-            />
-
+          <form onSubmit={handleSubmit(handleCreatePet)}>
+            {" "}
             <Input
               {...register("email")}
               isRequired
@@ -106,10 +98,14 @@ const PetOwnerSignUp = () => {
               isInvalid={Boolean(errors.email)}
               errorMessage={errors.email?.message}
               isClearable
-              className="border-11 border-s-orange-400 flex  mb-5 justify-center"
+              className=""
               description="We'll never share your email with anyone else."
             />
-
+            {errors.email && (
+              <p className="text-red-500 mt-2 mb-2 font-medium text-sm">
+                {errors.email.message}
+              </p>
+            )}
             <Input
               {...register("password")}
               label="Password"
@@ -117,6 +113,7 @@ const PetOwnerSignUp = () => {
               variant="bordered"
               isInvalid={Boolean(errors.password)}
               errorMessage={errors.password?.message}
+              //   value={password}
               endContent={
                 <button
                   className="bg-default-100 p-1 rounded-lg"
@@ -132,15 +129,19 @@ const PetOwnerSignUp = () => {
                 </button>
               }
               type={isVisible ? "text" : "password"}
-              className="border-11 mt-2 border-s-orange-400 flex justify-center"
+              className="border-11 mt-2 border-s-orange-400 flex items-center justify-center"
             />
-
+            {errors.password && (
+              <p className="text-red-500 mt-2  font-medium text-sm">
+                {errors.password.message}
+              </p>
+            )}
             <div className="flex mt-3 justify-center items-center">
               <Button
                 type="submit"
                 isLoading={isLoading}
                 color="primary"
-                className="w-full p-3 rounded-lg font-semibold text-sm"
+                className="w-full p-3 rounded-lg font-medium text-sm"
                 spinner={
                   <svg
                     className="animate-spin h-5 w-5 text-current"
@@ -164,20 +165,16 @@ const PetOwnerSignUp = () => {
                   </svg>
                 }
               >
-                Sign Up
+                Login
               </Button>
             </div>
           </form>
         </div>
-
-        <div
-          className="
-                        flex flex-col items-center justify-center"
-        >
-          <h3 className="text-sm mt-8 font-light text-center text-white">
-            Already Have an Account?
-            <span className=" ml-2 text-md font-medium text-center text-white hover:underline">
-              <Link href={"/doctors "}>Login</Link>
+        <div className="flex flex-col items-center justify-center">
+          <h3 className="dark:text-sm mt-8 font-light text-center text-white white:text-black">
+            Don't Have an Account Yet?
+            <span className="ml-2 text-md font-medium text-white hover:underline dark:text-black">
+              <Link href="/doctors/signup">Sign Up</Link>
             </span>
           </h3>
         </div>
@@ -199,4 +196,4 @@ const PetOwnerSignUp = () => {
   );
 };
 
-export default PetOwnerSignUp;
+export default Doctors;

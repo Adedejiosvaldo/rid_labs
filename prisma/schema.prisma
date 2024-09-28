@@ -34,13 +34,13 @@ model PetOwner {
   Appointment Appointment[]
 }
 
-model Vet {
-  id          String @id @default(cuid()) @map("_id")
-  name        String
-  specialty   String
-  phoneNumber String
-  email       String @unique
-}
+// model Vet {
+//   id          String @id @default(cuid()) @map("_id")
+//   name        String
+//   specialty   String
+//   phoneNumber String
+//   email       String @unique
+// }
 
 model Appointment {
   id         String   @id @default(cuid()) @map("_id")

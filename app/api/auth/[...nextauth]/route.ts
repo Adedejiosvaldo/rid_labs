@@ -17,8 +17,8 @@ const handler = NextAuth({
       },
       async authorize(credentials, req) {
         const callbackUrl = req.body?.callbackUrl;
-
-        console.log({ credentials, req });
+        console.log(callbackUrl);
+        // console.log({ credentials, req });
         // Fetch the user from the database using Prisma
         // const user = await prisma.petOwner.findUnique({
         //   where: { email: credentials?.email },
@@ -27,12 +27,14 @@ const handler = NextAuth({
         let user = null;
 
         if (callbackUrl.includes("/pets")) {
+          console.log("pets");
           // Check the database type for the /pets URL
           user = await prisma.petOwner.findUnique({
             where: { email: credentials?.email },
           });
         } else {
           // Check the database type for other URLs
+          console.log("doctor");
           user = await prisma.doctor.findUnique({
             where: { email: credentials?.email },
           });
