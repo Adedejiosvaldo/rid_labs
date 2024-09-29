@@ -34,7 +34,6 @@ const Doctors = async () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [signInVisible, setSignInVisible] = useState(false);
-  const [petType, setPetType] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -131,11 +130,6 @@ const Doctors = async () => {
               type={isVisible ? "text" : "password"}
               className="border-11 mt-2 border-s-orange-400 flex items-center justify-center"
             />
-            {errors.password && (
-              <p className="text-red-500 mt-2  font-medium text-sm">
-                {errors.password.message}
-              </p>
-            )}
             <div className="flex mt-3 justify-center items-center">
               <Button
                 type="submit"
