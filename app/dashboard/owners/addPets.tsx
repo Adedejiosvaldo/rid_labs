@@ -32,12 +32,48 @@ export default function App() {
   const handleCreatePet = async (data: CreatePetInput) => {
     setLoading(true);
     try {
-      console.log("Pet data submitted:", data);
-      // Example: await api.createPet(data);
+      console.log("Data being sent:", data); // Log the data being sent
+      const petData = {
+        ...data,
+        age: data.age.toString(), // Ensure age is sent as a string
+      };
+      console.log("Pet data:", petData);
+      const response = await fetch("/api/pets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(petData), // Send the pet data
+      });
+
+      console.log("Response:", response);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error response data:", errorData);
+
+        if (Array.isArray(errorData.error)) {
+          const errorMessages = errorData.error
+            .map((err: any) => err.message)
+            .join(", ");
+          throw new Error(errorMessages);
+        } else {
+          throw new Error(errorData.error || "Failed to create pet");
+        }
+      }
+
+      const newPet = await response.json();
+      console.log("Pet created successfully:", newPet);
       reset(); // Reset form after successful submission
       onOpenChange(); // Close modal
     } catch (error) {
-      console.error("Error creating pet:", error);
+      console.log("Error:", error);
+      // Improved error logging
+      if (error instanceof Error) {
+        console.error("Error creating pet:", error.message); // Log the error message
+      } else {
+        console.error("Error creating pet:", error); // Log the entire error object
+      }
     } finally {
       setLoading(false);
     }

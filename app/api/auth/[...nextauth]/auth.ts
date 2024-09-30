@@ -3,7 +3,6 @@ import { compare } from "bcrypt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { AuthOptions } from "next-auth";
 
-
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -55,4 +54,21 @@ export const authOptions = {
       },
     }),
   ],
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role;
+      }
+      return session;
+    },
+  },
 } as AuthOptions;

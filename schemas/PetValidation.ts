@@ -11,11 +11,10 @@ export const createPetSchema = z.object({
   }),
 
   age: z
-    .string()
-    .transform((val) => parseInt(val, 10)) // Convert string to integer
-    .refine((val) => Number.isInteger(val), {
-      message: "Age must be a valid integer.",
-    })
+    .union([
+      z.number().int().min(0).max(50),
+      z.string().transform((val) => parseInt(val, 10)),
+    ])
     .refine((val) => val >= 0 && val <= 50, {
       message: "Age must be between 0 and 50 years.",
     }),
