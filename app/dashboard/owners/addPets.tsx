@@ -37,7 +37,6 @@ export default function App() {
         ...data,
         age: data.age.toString(), // Ensure age is sent as a string
       };
-      console.log("Pet data:", petData);
       const response = await fetch("/api/pets", {
         method: "POST",
         headers: {
@@ -45,8 +44,6 @@ export default function App() {
         },
         body: JSON.stringify(petData), // Send the pet data
       });
-
-      console.log("Response:", response);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -63,7 +60,6 @@ export default function App() {
       }
 
       const newPet = await response.json();
-      console.log("Pet created successfully:", newPet);
       reset(); // Reset form after successful submission
       onOpenChange(); // Close modal
     } catch (error) {
@@ -81,7 +77,7 @@ export default function App() {
 
   return (
     <>
-      <Button onPress={onOpen} color="primary">
+      <Button onPress={onOpen} color="primary" className="font-medium p-4">
         Add Your Pet{" "}
       </Button>
       <Modal
@@ -92,7 +88,7 @@ export default function App() {
         }}
         placement="top-center"
       >
-        <ModalContent>
+        <ModalContent className="dark:bg-gray-800">
           {(onClose) => (
             <form onSubmit={handleSubmit(handleCreatePet)}>
               <ModalHeader className="flex flex-col gap-1">

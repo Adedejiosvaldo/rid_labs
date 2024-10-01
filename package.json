@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.5",
     "@hookform/resolvers": "^3.9.0",
     "@nextui-org/button": "2.0.38",
     "@nextui-org/code": "2.0.33",
@@ -27,11 +28,13 @@
     "@react-aria/ssr": "3.9.4",
     "@react-aria/visually-hidden": "3.8.12",
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.5.0",
     "clsx": "2.1.1",
     "framer-motion": "~11.1.9",
     "intl-messageformat": "^10.5.14",
     "next": "14.2.12",
     "next-auth": "^4.24.8",
+    "next-cloudinary": "^6.13.0",
     "next-themes": "^0.2.1",
     "prisma": "^5.20.0",
     "react": "18.3.1",

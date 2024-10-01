@@ -1,4 +1,5 @@
 import React from "react";
+import PetList from "./owners/petList";
 
 const DoctorsDashboard = () => {
   return (

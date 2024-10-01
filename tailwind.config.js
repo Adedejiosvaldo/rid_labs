@@ -9,7 +9,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)"],
+        poppins: ["Poppins", "sans-serif"],
+        sans: ["Poppins", "var(--font-sans)", "sans-serif"], // Poppins as the primary font
         mono: ["var(--font-mono)"],
       },
       borderRadius: {
@@ -62,5 +63,5 @@ module.exports = {
     },
   },
   darkMode: ["class", "class"],
-  plugins: [nextui(), require("tailwindcss-animate"), ],
+  plugins: [nextui(), require("tailwindcss-animate")],
 };

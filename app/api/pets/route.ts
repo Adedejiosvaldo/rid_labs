@@ -9,8 +9,6 @@ const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   const session = (await getServerSession(authOptions)) as CustomSession;
-  //   const { name, species, breed, age } = await request.json();
-  console.log("Session data:", JSON.stringify(session, null, 2));
 
   // In your POST handler
   const body = await request.json();
@@ -27,8 +25,6 @@ export async function POST(request: Request) {
 
   const { name, species, breed, age } = result.data;
 
-  console.log("Received data:", { name, species, breed, age });
-  console.log("Received data type:", session.user);
   // Check if the user role is 'user'
   if (
     !session.user?.role ||
@@ -60,6 +56,39 @@ export async function POST(request: Request) {
     console.error("Error creating pet in backend:", error);
     return NextResponse.json(
       { error: "Failed to create pet" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request: Request) {
+  const session = (await getServerSession(authOptions)) as CustomSession;
+
+  if (!session || !session.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const ownerId = session.user.id;
+
+  try {
+    const pets = await prisma.pet.findMany({
+      where: {
+        ownerId: ownerId,
+      },
+      select: {
+        id: true,
+        name: true,
+        species: true,
+        breed: true,
+        age: true,
+      },
+    });
+
+    return NextResponse.json(pets, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching pets:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch pets" },
       { status: 500 }
     );
   }
