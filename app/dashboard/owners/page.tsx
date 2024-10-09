@@ -16,9 +16,8 @@ const PetOwnersDashboard = () => {
 
       {/* <AddPetCardDashboard /> */}
 
-      <div className="flex flex-col md:flex-row justify-evenly items-center">
+      <div className="flex flex-col md:flex-row gap-4 justify-evenly items-center">
         <p>Add Your Pet</p>
-
         <AddPets />
       </div>
       {/* My Pets */}
@@ -34,6 +33,7 @@ const PetOwnersDashboard = () => {
       <PetList />
       <Divider className="my-4" />
       <h2>Upcoming Appointments</h2>
+      
       {/* List of upcoming appointments */}
       <h2>Vaccination Records</h2>
       {/* Access to vaccination records */}

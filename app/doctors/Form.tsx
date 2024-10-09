@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect, useRouter } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Doctors = async () => {
   const router = useRouter();

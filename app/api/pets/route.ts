@@ -81,6 +81,7 @@ export async function GET(request: Request) {
         species: true,
         breed: true,
         age: true,
+        imageUrl: true,
       },
     });
 

@@ -17,7 +17,9 @@ import {
   PencilIcon,
   CheckIcon,
 } from "@heroicons/react/24/solid";
-import { CldUploadWidget } from "next-cloudinary";
+import { CldUploadWidget, CldUploadButton } from "next-cloudinary";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Pet {
   id: string;
@@ -40,11 +42,13 @@ interface CloudinaryResult {
 export default function PetDetailsPage() {
   const [pet, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saveLoading, setSaveLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [updatedFields, setUpdatedFields] = useState<Partial<Pet>>({});
   const params = useParams();
   const router = useRouter();
   const petId = params.petId as string;
+  const [tempImageUrl, setTempImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPetDetails();
@@ -81,6 +85,12 @@ export default function PetDetailsPage() {
     setEditing(!editing);
   };
 
+  const handleCancel = () => {
+    setEditing(false);
+    setUpdatedFields({});
+    setTempImageUrl(null);
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -89,12 +99,24 @@ export default function PetDetailsPage() {
   };
 
   const handleImageUpload = (result: CloudinaryResult) => {
-    setUpdatedFields((prev) => ({ ...prev, imageUrl: result.info.secure_url }));
+    console.log("Upload Result:", result); // Add this line for debugging
+    const newImageUrl = result.info.secure_url;
+    setUpdatedFields((prev) => ({
+      ...prev,
+      imageUrl: newImageUrl,
+    }));
+
+    setTempImageUrl(newImageUrl);
+
+    // setPet((prevPet) => ({
+    //   ...prevPet!,
+    //   imageUrl: newImageUrl,
+    // }));
   };
 
   const handleSave = async () => {
     if (!pet) return;
-
+    setSaveLoading(true);
     try {
       const response = await fetch(`/api/pets/${petId}`, {
         method: "PATCH",
@@ -106,10 +128,16 @@ export default function PetDetailsPage() {
       if (!response.ok) throw new Error("Failed to update pet");
       const updatedPet = await response.json();
       setPet(updatedPet);
+      setSaveLoading(false);
       setEditing(false);
       setUpdatedFields({});
+      setTempImageUrl(null);
+      toast.success("Pet information updated successfully!");
     } catch (error) {
       console.error("Error updating pet:", error);
+      toast.error("Failed to update pet information");
+    } finally {
+      setSaveLoading(false);
     }
   };
 
@@ -126,20 +154,30 @@ export default function PetDetailsPage() {
         Back to Pets
       </Button>
       <Card className="shadow-lg">
-        <CardHeader className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
+        <CardHeader className="flex justify-end">
+          {!editing && (
+            <Button
+              startContent={<PencilIcon className="h-5 w-5" />}
+              onPress={handleEditToggle}
+            >
+              Edit
+            </Button>
+          )}
+        </CardHeader>
+        <CardBody className="space-y-6">
+          <div className="flex flex-col items-center gap-4">
             <Image
-              alt={pet.name}
               src={
-                updatedFields.imageUrl ||
-                pet.imageUrl ||
+                tempImageUrl ||
+                pet?.imageUrl ||
                 `https://robohash.org/${pet.name}${pet.species}?set=set${
                   pet.species === "dog" ? "1" : "2"
-                }&size=100x100`
+                }&size=200x200`
               }
-              width={100}
-              height={100}
-              className="rounded-full object-cover"
+              alt={pet.name}
+              width={300}
+              height={300}
+              className="rounded-lg object-cover"
             />
             <div>
               {editing ? (
@@ -157,33 +195,53 @@ export default function PetDetailsPage() {
               </p>
             </div>
           </div>
-          <Button
-            startContent={
-              editing ? (
-                <CheckIcon className="h-5 w-5" />
-              ) : (
-                <PencilIcon className="h-5 w-5" />
-              )
-            }
-            onPress={editing ? handleSave : handleEditToggle}
-          >
-            {editing ? "Save" : "Edit"}
-          </Button>
-        </CardHeader>
+          {/* {!editing && (
+            <Button
+              startContent={<PencilIcon className="h-5 w-5" />}
+              onPress={handleEditToggle}
+            >
+              Edit
+            </Button>
+          )} */}
+        </CardBody>
         <Divider />
         <CardBody className="space-y-4">
           {editing && (
-            <CldUploadWidget
-              uploadPreset="your_upload_preset"
-              onUpload={(result) =>
-                handleImageUpload(result as CloudinaryResult)
-              }
-            >
-              {({ open }) => (
-                <Button onClick={() => open()}>Upload Image</Button>
-              )}
-            </CldUploadWidget>
+            <div className=" p-4 rounded-lg text-center">
+              <h3 className="text-lg font-semibold mb-2">Update Pet Picture</h3>
+              <p className=" mb-4">
+                Click below to upload a new picture of your pet
+              </p>
+              <CldUploadWidget
+                uploadPreset="pet_images"
+                onSuccess={(result) => {
+                  handleImageUpload(result as CloudinaryResult);
+                }}
+                onError={(error) => {
+                  console.error("Upload error:", error);
+                }}
+              >
+                {({ open }) => {
+                  return (
+                    <Button
+                      color="primary"
+                      onPress={() => {
+                        setUpdatedFields((prev) => ({
+                          ...prev,
+                          imageUrl: undefined,
+                        }));
+                        open();
+                      }}
+                      className="mx-auto"
+                    >
+                      Upload Pet Picture
+                    </Button>
+                  );
+                }}
+              </CldUploadWidget>
+            </div>
           )}
+
           <div>
             <h3 className="text-lg font-semibold mb-2">Age</h3>
             {editing ? (
@@ -233,7 +291,35 @@ export default function PetDetailsPage() {
             <p>{pet.nextTreatment || "No upcoming treatments scheduled."}</p>
           </div>
         </CardBody>
+        {editing && (
+          <div className="flex justify-center gap-4 p-4">
+            <Button color="danger" onPress={handleCancel}>
+              Cancel
+            </Button>
+            <Button
+              isLoading={saveLoading}
+              color="primary"
+              startContent={<CheckIcon className="h-5 w-5" />}
+              onPress={handleSave}
+            >
+              Save
+            </Button>
+          </div>
+        )}
       </Card>
+
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 }

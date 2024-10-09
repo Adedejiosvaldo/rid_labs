@@ -9,6 +9,7 @@ interface Pet {
   species: string;
   breed: string;
   age: number;
+  imageUrl: string;
 }
 
 export default function PetsPage() {
@@ -24,6 +25,7 @@ export default function PetsPage() {
           throw new Error("Failed to fetch pets");
         }
         const data = await response.json();
+        console.log(data);
         setPets(data);
       } catch (error) {
         console.error("Error fetching pets:", error);
@@ -90,7 +92,7 @@ export default function PetsPage() {
                   width="100%"
                   alt={pet.name}
                   className="w-full object-cover h-[140px]"
-                  src={getRoboHashImage(pet.name, pet.species)}
+                  src={pet.imageUrl || getRoboHashImage(pet.name, pet.species)}
                 />
               </CardBody>
               <CardFooter className="text-small justify-between">
