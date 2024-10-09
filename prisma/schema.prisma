@@ -19,7 +19,6 @@ model Doctor {
   email       String @unique
   password    String
   role        String @default("doctor")
-  appointments Appointment[]
 }
 
 model PetOwner {
@@ -47,10 +46,12 @@ model Appointment {
   date       DateTime
   time       DateTime
   reason     String
-  doctor     Doctor   @relation(fields: [doctorId], references: [id])
-  doctorId   String
+
   petOwner   PetOwner @relation(fields: [petOwnerId], references: [id])
+  pet        Pet      @relation(fields: [petId], references: [id])
   petOwnerId String
+  petId      String
+  @@index([petId])
 }
 
 model Pet {
@@ -62,6 +63,7 @@ model Pet {
   imageUrl     String?
   owner        PetOwner      @relation(fields: [ownerId], references: [id])
   ownerId      String
+  appointments Appointment[]
   vaccinations Vaccination[]
 }
 

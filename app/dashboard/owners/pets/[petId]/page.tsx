@@ -20,6 +20,7 @@ import {
 import { CldUploadWidget, CldUploadButton } from "next-cloudinary";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Appointment from "../../Appointment";
 
 interface Pet {
   id: string;
@@ -31,6 +32,7 @@ interface Pet {
   description?: string;
   vaccinationRecords?: { name: string; date: string }[];
   nextTreatment?: string;
+  ownerId: string; // Add this line
 }
 
 interface CloudinaryResult {
@@ -285,12 +287,16 @@ export default function PetDetailsPage() {
               <p>No vaccination records available.</p>
             )}
           </div>
+
           <Divider />
           <div>
             <h3 className="text-lg font-semibold mb-2">Next Treatment</h3>
             <p>{pet.nextTreatment || "No upcoming treatments scheduled."}</p>
           </div>
+          <Divider />
         </CardBody>
+
+        <Appointment petId={petId} petOwnerId={pet.ownerId} />
         {editing && (
           <div className="flex justify-center gap-4 p-4">
             <Button color="danger" onPress={handleCancel}>
