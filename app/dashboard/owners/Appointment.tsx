@@ -109,38 +109,54 @@ const PetAppointments: React.FC<PetAppointmentsProps> = ({
   const fetchAvailableTimes = async (date: DateValue) => {
     try {
       const dateString = date.toString();
-
       const response = await fetch(
         `/api/doctors/appointments?date=${dateString}`
       );
       if (!response.ok) throw new Error("Failed to fetch available times");
-      const times = await response.json();
+      const availableTimes = await response.json();
 
-      console.log("All times:", times);
-      const bookedTimes = appointments
-        .filter((apt) => {
-          const aptDate = new Date(apt.date);
-          return aptDate.toISOString().split("T")[0] === dateString;
-        })
-        .map((apt) => {
-          const aptTime = new Date(apt.time);
-          return `${aptTime.getHours().toString().padStart(2, "0")}:${aptTime
-            .getMinutes()
-            .toString()
-            .padStart(2, "0")}`;
-        });
-      console.log("Booked times:", bookedTimes);
-
-      const availableTimes = times.filter(
-        (time: string) => !bookedTimes.includes(time)
-      );
-      console.log("Available times:", availableTimes);
       setAvailableTimes(availableTimes);
     } catch (error) {
       console.error("Error fetching available times:", error);
       toast.error("Failed to load available times");
     }
   };
+
+  //   const fetchAvailableTimes = async (date: DateValue) => {
+  //     try {
+  //       const dateString = date.toString();
+
+  //       const response = await fetch(
+  //         `/api/doctors/appointments?date=${dateString}`
+  //       );
+  //       if (!response.ok) throw new Error("Failed to fetch available times");
+  //       const times = await response.json();
+
+  //       console.log("All times:", times);
+  //       const bookedTimes = appointments
+  //         .filter((apt) => {
+  //           const aptDate = new Date(apt.date);
+  //           return aptDate.toISOString().split("T")[0] === dateString;
+  //         })
+  //         .map((apt) => {
+  //           const aptTime = new Date(apt.time);
+  //           return `${aptTime.getHours().toString().padStart(2, "0")}:${aptTime
+  //             .getMinutes()
+  //             .toString()
+  //             .padStart(2, "0")}`;
+  //         });
+  //       console.log("Booked times:", bookedTimes);
+
+  //       const availableTimes = times.filter(
+  //         (time: string) => !bookedTimes.includes(time)
+  //       );
+  //       console.log("Available times:", availableTimes);
+  //       setAvailableTimes(availableTimes);
+  //     } catch (error) {
+  //       console.error("Error fetching available times:", error);
+  //       toast.error("Failed to load available times");
+  //     }
+  //   };
 
   const handleDateSelect = (date: DateValue) => {
     setSelectedDate(date);
