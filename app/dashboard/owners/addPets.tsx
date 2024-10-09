@@ -77,8 +77,13 @@ export default function App() {
 
   return (
     <>
-      <Button onPress={onOpen} color="primary" className="font-medium p-4">
-        Add Your Pet{" "}
+      <Button
+        onPress={onOpen}
+        color="primary"
+        size="lg"
+        className="font-medium p-4 w-full sm:w-auto sm:min-w-[200px] mb-4"
+      >
+        <span className="text-md font-bold ">Add Your Pet</span>
       </Button>
       <Modal
         isOpen={isOpen}
