@@ -3,6 +3,13 @@ import { compare } from "bcrypt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { AuthOptions } from "next-auth";
 
+interface User {
+  id: string;
+  email: string;
+  role: string;
+  password: string;
+}
+
 export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
@@ -19,19 +26,31 @@ export const authOptions = {
         const callbackUrl = req.body?.callbackUrl;
         console.log(callbackUrl);
 
-        let user = null;
+        let user: User | null = null;
 
-        if (callbackUrl.includes("/pets")) {
-          console.log("pets");
-          user = await prisma.petOwner.findUnique({
-            where: { email: credentials?.email },
-          });
-        } else {
-          console.log("doctor");
-          user = await prisma.doctor.findUnique({
-            where: { email: credentials?.email },
-          });
+        switch (true) {
+          case callbackUrl.includes("/pets"):
+            user = (await prisma.petOwner.findUnique({
+              where: { email: credentials?.email },
+            })) as User | null;
+            break;
+          default:
+            user = (await prisma.doctor.findUnique({
+              where: { email: credentials?.email },
+            })) as User | null;
         }
+
+        // if (callbackUrl.includes("/pets")) {
+        //   console.log("pets");
+        //   user = await prisma.petOwner.findUnique({
+        //     where: { email: credentials?.email },
+        //   });
+        // } else {
+        //   console.log("doctor");
+        //   user = await prisma.doctor.findUnique({
+        //     where: { email: credentials?.email },
+        //   });
+        // }
 
         if (!user) {
           throw new Error("User not found");
@@ -58,7 +77,6 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.name = user.name;
         token.id = user.id;
         token.role = user.role;
       }
@@ -68,7 +86,6 @@ export const authOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role;
-        session.user.name = token.name;
       }
       return session;
     },

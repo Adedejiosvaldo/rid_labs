@@ -9,6 +9,7 @@ import AddPetCardDashboard from "./addPetCard";
 import { useTheme } from "next-themes";
 import Appointment from "./Appointment";
 import AppointmentList from "./appointmentList";
+import VaccinationList from "./VaccinationList";
 
 const PetOwnersDashboard = () => {
   return (
@@ -33,7 +34,8 @@ const PetOwnersDashboard = () => {
       <AppointmentList />
       <Divider className="my-4" />
       {/* List of upcoming appointments */}
-      <h2>Vaccination Records</h2>
+      <VaccinationList />
+      <Divider className="my-4" />
       {/* Access to vaccination records */}
     </div>
   );

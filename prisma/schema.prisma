@@ -46,6 +46,8 @@ model Appointment {
   date       DateTime
   time       DateTime
   reason     String
+  status     String   @default("upcoming") // Add this line
+  notes      String?  // Add this line
 
   petOwner   PetOwner @relation(fields: [petOwnerId], references: [id])
   pet        Pet      @relation(fields: [petId], references: [id])

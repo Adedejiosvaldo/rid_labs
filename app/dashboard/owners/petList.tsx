@@ -96,8 +96,11 @@ export default function PetsPage() {
                 />
               </CardBody>
               <CardFooter className="text-small justify-between">
-                <b>{pet.name}</b>
-                <p className="text-default-500">{pet.species.toUpperCase()}</p>
+                <b className="font-poppins font-bold text-md">{pet.name}</b>
+                <p className="text-default-400 font-poppins font-medium">
+                  {pet.species.charAt(0).toUpperCase() +
+                    pet.species.slice(1).toLowerCase()}
+                </p>
               </CardFooter>
             </Card>
           ))}

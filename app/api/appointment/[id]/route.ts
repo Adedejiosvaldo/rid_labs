@@ -1,6 +1,7 @@
 import prisma from "@/prisma/db";
-import { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
+import { authOptions } from "../../auth/[...nextauth]/auth";
 
 export async function GET(
   request: NextRequest,
@@ -26,16 +27,29 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || session.user.role !== "doctor") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { id } = params;
-  const body = await request.json();
-  const { date, time, reason } = body;
+  const { status, notes } = await request.json();
 
-  const updatedAppointment = await prisma.appointment.update({
-    where: { id },
-    data: { date, time, reason },
-  });
+  try {
+    const updatedAppointment = await prisma.appointment.update({
+      where: { id },
+      data: { status, notes },
+    });
 
-  return NextResponse.json(updatedAppointment);
+    return NextResponse.json(updatedAppointment);
+  } catch (error) {
+    console.error("Failed to update appointment:", error);
+    return NextResponse.json(
+      { error: "Failed to update appointment" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE(

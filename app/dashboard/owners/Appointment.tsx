@@ -22,6 +22,7 @@ import {
   TableRow,
   TableCell,
   Chip,
+  Divider,
 } from "@nextui-org/react";
 import {
   today,
@@ -258,6 +259,9 @@ const PetAppointments: React.FC<PetAppointmentsProps> = ({
       >
         Book An Appointment
       </Button>
+
+      <Divider />
+
       {appointments.length > 0 ? (
         <Table aria-label="Appointments table">
           <TableHeader>

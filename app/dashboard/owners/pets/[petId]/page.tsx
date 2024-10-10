@@ -282,13 +282,13 @@ export default function PetDetailsPage() {
           </div>
 
           <Divider />
-          <div>
+          {/* <div>
             <h2 className="text-xl font-poppins font-bold">
-              Vaccination Records
+              Upcoming Appointments
             </h2>
             <p>{pet.nextTreatment || "No upcoming treatments scheduled."}</p>
-          </div>
-          <Divider />
+          </div> */}
+          {/* <Divider /> */}
         </CardBody>
 
         <Appointment petId={petId} petOwnerId={pet.ownerId} />

@@ -1,7 +1,7 @@
 "use client";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
-import { Input, Modal } from "@nextui-org/react";
+import { Input, Modal, Spinner } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { FaEye } from "react-icons/fa6";
 import { FaEyeSlash } from "react-icons/fa6";
@@ -16,13 +16,13 @@ import { useForm } from "react-hook-form";
 type IssueForm = z.infer<typeof LoginSchemaDoctors>;
 import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect, useRouter } from "next/navigation";
-import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Doctors = async () => {
+const Doctors = () => {
   const router = useRouter();
-  const session = await getServerSession();
+  const { data: session, status } = useSession();
   console.log({ session });
   const {
     register,
@@ -67,9 +67,25 @@ const Doctors = async () => {
       setIsLoading(false);
     }
   };
-  if (session) {
-    redirect("/dashboard/doctors");
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/dashboard/doctor");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Spinner color="primary" />
+      </div>
+    );
   }
+
+  if (status === "authenticated") {
+    return null; // This will prevent any flash of content before redirect
+  }
+
   return (
     <>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
@@ -101,11 +117,6 @@ const Doctors = async () => {
               className=""
               description="We'll never share your email with anyone else."
             />
-            {errors.email && (
-              <p className="text-red-500 mt-2 mb-2 font-medium text-sm">
-                {errors.email.message}
-              </p>
-            )}
             <Input
               {...register("password")}
               label="Password"
