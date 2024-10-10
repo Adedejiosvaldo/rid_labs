@@ -9,9 +9,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        poppins: ["Poppins", "sans-serif"],
-        sans: ["Poppins", "var(--font-sans)", "sans-serif"], // Poppins as the primary font
-        mono: ["var(--font-mono)"],
+        // poppins: ["Poppins", "sans-serif"],
+        sans: ["Poppins", "sans-serif"], // Poppins as the primary font
+        // mono: ["var(--font-mono)"],
       },
       borderRadius: {
         lg: "var(--radius)",

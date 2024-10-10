@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
         date: apt.date.toISOString(),
         petName: apt.pet.name,
         reason: apt.reason,
-        status: status,
+        status: apt.status,
       };
     });
 
