@@ -19,6 +19,7 @@ model Doctor {
   email       String @unique
   password    String
   role        String @default("doctor")
+
 }
 
 model PetOwner {
@@ -74,6 +75,9 @@ model Vaccination {
   id    String   @id @default(cuid()) @map("_id")
   name  String
   date  DateTime
+  status       String   @default("upcoming") // Add this line
+  notes        String?  // Add this line
+  nextDate     DateTime? // Add this line
   pet   Pet      @relation(fields: [petId], references: [id])
   petId String
 }
