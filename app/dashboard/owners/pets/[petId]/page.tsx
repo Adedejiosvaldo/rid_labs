@@ -21,6 +21,7 @@ import { CldUploadWidget, CldUploadButton } from "next-cloudinary";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Appointment from "../../Appointment";
+import Vaccination from "../../Vacination";
 
 interface Pet {
   id: string;
@@ -274,23 +275,17 @@ export default function PetDetailsPage() {
           </div>
           <Divider />
           <div>
-            <h3 className="text-lg font-semibold mb-2">Vaccination Records</h3>
-            {pet.vaccinationRecords && pet.vaccinationRecords.length > 0 ? (
-              <ul className="list-disc list-inside">
-                {pet.vaccinationRecords.map((record, index) => (
-                  <li key={index}>
-                    {record.name} - {record.date}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No vaccination records available.</p>
-            )}
+            <h2 className="text-xl font-poppins font-bold">
+              Vaccination Records
+            </h2>{" "}
+            <Vaccination petId={pet.id} />
           </div>
 
           <Divider />
           <div>
-            <h3 className="text-lg font-semibold mb-2">Next Treatment</h3>
+            <h2 className="text-xl font-poppins font-bold">
+              Vaccination Records
+            </h2>
             <p>{pet.nextTreatment || "No upcoming treatments scheduled."}</p>
           </div>
           <Divider />

@@ -258,32 +258,37 @@ const PetAppointments: React.FC<PetAppointmentsProps> = ({
       >
         Book An Appointment
       </Button>
-
-      <Table aria-label="Appointments table">
-        <TableHeader>
-          <TableColumn>Date</TableColumn>
-          <TableColumn>Time</TableColumn>
-          <TableColumn>Reason</TableColumn>
-          <TableColumn>Status</TableColumn>
-        </TableHeader>
-        <TableBody>
-          {appointments.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell>{renderCell(item, "date")}</TableCell>
-              <TableCell>{renderCell(item, "time")}</TableCell>
-              <TableCell>{renderCell(item, "reason")}</TableCell>
-              <TableCell>
-                <StatusChip
-                  status={getAppointmentStatus(
-                    item.date.toString(),
-                    item.time.toString()
-                  )}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {appointments.length > 0 ? (
+        <Table aria-label="Appointments table">
+          <TableHeader>
+            <TableColumn>Date</TableColumn>
+            <TableColumn>Time</TableColumn>
+            <TableColumn>Reason</TableColumn>
+            <TableColumn>Status</TableColumn>
+          </TableHeader>
+          <TableBody>
+            {appointments.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell>{renderCell(item, "date")}</TableCell>
+                <TableCell>{renderCell(item, "time")}</TableCell>
+                <TableCell>{renderCell(item, "reason")}</TableCell>
+                <TableCell>
+                  <StatusChip
+                    status={getAppointmentStatus(
+                      item.date.toString(),
+                      item.time.toString()
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <p className="text-center text-gray-500 mb-4">
+          No appointments scheduled.
+        </p>
+      )}
 
       <Modal
         isOpen={isOpen}
