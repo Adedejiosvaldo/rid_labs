@@ -23,30 +23,30 @@ export async function GET(
   }
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: { petId: string } }
-) {
-  const petId = parseInt(params.petId);
-  const { vaccineName, dateAdministered, expirationDate } =
-    await request.json();
+// export async function POST(
+//   request: Request,
+//   { params }: { params: { petId: string } }
+// ) {
+//   const petId = params.petId;
+//   const { vaccineName, dateAdministered, expirationDate } =
+//     await request.json();
 
-  try {
-    const newVaccination = await prisma.vaccination.create({
-      data: {
-        petId,
-        vaccineName,
-        dateAdministered: new Date(dateAdministered),
-        expirationDate: new Date(expirationDate),
-      },
-    });
+//   try {
+//     const newVaccination = await prisma.vaccination.create({
+//       data: {
+//         petId,
+//         vaccineName,
+//         dateAdministered: new Date(dateAdministered),
+//         expirationDate: new Date(expirationDate),
+//       },
+//     });
 
-    return NextResponse.json(newVaccination, { status: 201 });
-  } catch (error) {
-    console.error("Failed to create vaccination record:", error);
-    return NextResponse.json(
-      { error: "Failed to create vaccination record" },
-      { status: 500 }
-    );
-  }
-}
+//     return NextResponse.json(newVaccination, { status: 201 });
+//   } catch (error) {
+//     console.error("Failed to create vaccination record:", error);
+//     return NextResponse.json(
+//       { error: "Failed to create vaccination record" },
+//       { status: 500 }
+//     );
+//   }
+// }

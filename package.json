@@ -50,7 +50,7 @@
     "react-hook-form-resolvers": "^0.0.1",
     "react-icons": "^5.3.0",
     "react-toastify": "^10.0.5",
-    "resolvers": "link:@types/@hookform/resolvers",
+    "@types/@hookform/resolvers": "^2.9.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
   },

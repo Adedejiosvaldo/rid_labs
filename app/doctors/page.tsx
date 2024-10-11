@@ -25,7 +25,7 @@ export default async function DoctorsPage() {
       redirect("/dashboard/doctor");
     } else {
       // If the user is authenticated but not a doctor, redirect to a different page
-      redirect("/dashboard"); // or wherever non-doctor users should go
+      redirect("/dashboard/owners"); // or wherever non-doctor users should go
     }
   }
 
