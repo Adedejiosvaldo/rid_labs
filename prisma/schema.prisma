@@ -62,7 +62,7 @@ model Pet {
   name         String
   species      String
   breed        String
-  age          Int
+  age          DateTime
   imageUrl     String?
   owner        PetOwner      @relation(fields: [ownerId], references: [id])
   ownerId      String

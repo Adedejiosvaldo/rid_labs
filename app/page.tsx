@@ -42,7 +42,7 @@ export default function Home() {
         </Link>
       </div>
 
-      <div className="mt-8" p-2>
+      <div className="mt-8 p-2">
         {/* <Snippet hideCopyButton hideSymbol variant="solid"> */}
 
         <p>

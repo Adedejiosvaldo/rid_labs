@@ -10,14 +10,7 @@ export const createPetSchema = z.object({
     errorMap: () => ({ message: "Please select a valid pet type." }),
   }),
 
-  age: z
-    .union([
-      z.number().int().min(0).max(50),
-      z.string().transform((val) => parseInt(val, 10)),
-    ])
-    .refine((val) => val >= 0 && val <= 50, {
-      message: "Age must be between 0 and 50 years.",
-    }),
+  age: z.date().max(new Date(), "Pet age cannot be in the future."),
 
   breed: z
     .string()

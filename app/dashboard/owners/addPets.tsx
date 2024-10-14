@@ -133,10 +133,12 @@ export default function App() {
                   errorMessage={errors.breed?.message}
                 />
                 <Input
-                  {...register("age")}
+                  {...register("age", {
+                    setValueAs: (value) => new Date(value),
+                  })}
                   label="Pet Age"
                   placeholder="Enter pet's age"
-                  type="number"
+                  type="date"
                   variant="bordered"
                   isInvalid={Boolean(errors.age)}
                   errorMessage={errors.age?.message}
