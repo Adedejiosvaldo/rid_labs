@@ -27,6 +27,7 @@ export default function App() {
     resolver: zodResolver(createPetSchema),
   });
   const [loading, setLoading] = useState(false); // Add loading state
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const handleCreatePet = async (data: CreatePetInput) => {
@@ -35,8 +36,11 @@ export default function App() {
       console.log("Data being sent:", data); // Log the data being sent
       const petData = {
         ...data,
-        age: data.age.toString(), // Ensure age is sent as a string
+        // age: new Date(data.age).toISOString(), // Convert the Date object to ISO string
+        age: data.age.toISOString(),
+        // Convert Date to ISO string
       };
+      console.log("Pet data:", petData); // Log the pet data
       const response = await fetch("/api/pets", {
         method: "POST",
         headers: {
@@ -66,8 +70,12 @@ export default function App() {
       console.log("Error:", error);
       // Improved error logging
       if (error instanceof Error) {
+        setErrorMessage(error.message); // Set the error message
+
         console.error("Error creating pet:", error.message); // Log the error message
       } else {
+        setErrorMessage("An unexpected error occurred."); // Set a generic error message
+
         console.error("Error creating pet:", error); // Log the entire error object
       }
     } finally {
@@ -100,6 +108,12 @@ export default function App() {
                 Add New Pet
               </ModalHeader>
               <ModalBody>
+                {errorMessage && (
+                  <div className="text-red-500 font-semibold text-sm">
+                    {errorMessage}
+                  </div>
+                )}{" "}
+                {/* Display error message */}
                 <Input
                   {...register("name")}
                   label="Pet Name"
@@ -123,7 +137,6 @@ export default function App() {
                     <SelectItem key={animal.key}>{animal.label}</SelectItem>
                   ))}
                 </Select>
-
                 <Input
                   {...register("breed")}
                   label="Pet Breed"

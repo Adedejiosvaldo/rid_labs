@@ -63,9 +63,13 @@ export default function PetsPage() {
   };
 
   return (
-    <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
-      {loading
-        ? // Show skeletons while loading
+    <div className="p-4">
+      <h1 className="text-2xl text-left font-poppins font-bold mb-4">
+        My Pets
+      </h1>
+      <div className="gap-2  grid grid-cols-2 sm:grid-cols-4">
+        {loading ? (
+          // Show skeletons while loading
           Array.from({ length: 8 }).map((_, index) => (
             <Card key={index} shadow="sm">
               <CardBody className="overflow-visible p-0">
@@ -77,7 +81,12 @@ export default function PetsPage() {
               </CardFooter>
             </Card>
           ))
-        : // Render pets once loaded
+        ) : pets.length === 0 ? ( // Check if there are no pets
+          <div className=" text-white">
+            <p className="text-left font-poppins">No pets available.</p>{" "}
+          </div>
+        ) : (
+          // Render pets once loaded
           pets.map((pet) => (
             <Card
               shadow="sm"
@@ -103,7 +112,9 @@ export default function PetsPage() {
                 </p>
               </CardFooter>
             </Card>
-          ))}
+          ))
+        )}
+      </div>
     </div>
   );
 }

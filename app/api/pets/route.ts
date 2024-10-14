@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/auth";
 import { CustomSession } from "@/types/custom";
 import { createPetSchema } from "@/schemas/PetValidation";
-
-const prisma = new PrismaClient();
+import { getServerSession } from "next-auth/next";
+import prisma from "@/prisma/db";
 
 export async function POST(request: Request) {
   const session = (await getServerSession(authOptions)) as CustomSession;
 
   // In your POST handler
   const body = await request.json();
-  const result = createPetSchema.safeParse(body);
+  const result = createPetSchema.safeParse({
+    ...body,
+    age: new Date(body.age),
+  });
 
   if (!result.success) {
     console.log("Validation failed:", result.error.issues);
@@ -25,6 +26,8 @@ export async function POST(request: Request) {
 
   const { name, species, breed, age } = result.data;
 
+  const dateAge = new Date(age);
+  console.log(dateAge);
   // Check if the user role is 'user'
   if (
     !session.user?.role ||
@@ -44,7 +47,7 @@ export async function POST(request: Request) {
         name,
         species,
         breed: breed,
-        age: age,
+        age: dateAge,
         owner: {
           connect: { id: ownerId },
         },

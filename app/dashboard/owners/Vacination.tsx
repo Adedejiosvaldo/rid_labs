@@ -65,8 +65,10 @@ export default function Vaccination({ petId }: VaccinationProps) {
             ))}
           </TableBody>
         </Table>
-      ) : (
-        <p>No vaccination records found.</p>
+        ) : (
+            <p className="text-left font-poppins">
+            No vaccination records found.
+          </p>
       )}
     </div>
   );

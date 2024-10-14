@@ -23,12 +23,19 @@ import "react-toastify/dist/ReactToastify.css";
 import Appointment from "../../Appointment";
 import Vaccination from "../../Vacination";
 
+interface Age {
+  years: number;
+  months: number;
+  days: number;
+  formatted: string; // e.g., "2 years, 3 months, and 5 days"
+}
+
 interface Pet {
   id: string;
   name: string;
   species: string;
   breed: string;
-  age: number;
+  age: Age; // Use the Age type for the age property
   imageUrl?: string;
   description?: string;
   vaccinationRecords?: { name: string; date: string }[];
@@ -57,12 +64,68 @@ export default function PetDetailsPage() {
     fetchPetDetails();
   }, [petId]);
 
+  function calculateAge(birthDate: Date): {
+    years: number;
+    months: number;
+    days: number;
+    formatted: string;
+  } {
+    const today = new Date();
+
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+
+    // Adjust if the current month is before the birth month
+    if (days < 0) {
+      months--;
+      const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0); // Get last day of the previous month
+      days += lastMonth.getDate(); // Add the number of days in the last month
+    }
+
+    // Adjust if the current year is before the birth year
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    // Format the output based on the calculated values
+    let formatted = "";
+    if (years > 0) {
+      formatted = `${years} year${years > 1 ? "s" : ""}, ${months} month${
+        months !== 1 ? "s" : ""
+      }, and ${days} day${days !== 1 ? "s" : ""}`;
+    } else if (months > 0) {
+      formatted = `${months} month${months !== 1 ? "s" : ""}, and ${days} day${
+        days !== 1 ? "s" : ""
+      }`;
+    } else {
+      formatted = `${days} day${days !== 1 ? "s" : ""}`;
+    }
+
+    return { years, months, days, formatted };
+  }
   const fetchPetDetails = async () => {
     try {
       const response = await fetch(`/api/pets/${petId}`);
       if (!response.ok) throw new Error("Failed to fetch pet details");
       const data = await response.json();
-      setPet(data);
+      console.log(data);
+      // Convert age to Date if it's a string
+      // Convert age to Date if it's a string
+      const birthDate =
+        typeof data.age === "string" ? new Date(data.age) : data.age;
+
+      // Check if the date is valid
+      if (isNaN(birthDate.getTime())) {
+        throw new Error("Invalid date provided for age");
+      }
+
+      const newAge = calculateAge(birthDate);
+      console.log(newAge.formatted); // Log the formatted age
+      setPet({ ...data, age: newAge });
+      console.log(newAge);
+      setPet({ ...data, age: newAge });
     } catch (error) {
       console.error("Error fetching pet details:", error);
     } finally {
@@ -80,7 +143,6 @@ export default function PetDetailsPage() {
       // If we're entering edit mode, initialize updatedFields with current pet data
       setUpdatedFields({
         name: pet?.name,
-        age: pet?.age,
         description: pet?.description,
         imageUrl: pet?.imageUrl,
       });
@@ -148,7 +210,7 @@ export default function PetDetailsPage() {
   if (!pet) return <div>Pet not found</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto p-4 mb-4">
       <Button
         startContent={<ArrowLeftIcon className="h-5 w-5" />}
         onPress={handleBackClick}
@@ -247,17 +309,7 @@ export default function PetDetailsPage() {
 
           <div>
             <h3 className="text-lg font-semibold mb-2">Age</h3>
-            {editing ? (
-              <Input
-                name="age"
-                value={updatedFields.age?.toString() || ""}
-                onChange={handleInputChange}
-                type="number"
-                className="max-w-xs"
-              />
-            ) : (
-              <p>{pet.age} years</p>
-            )}
+            <p>{pet.age.formatted}</p>
           </div>
           <Divider />
           <div>

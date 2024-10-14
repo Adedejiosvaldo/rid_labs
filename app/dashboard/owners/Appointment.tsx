@@ -247,9 +247,11 @@ const PetAppointments: React.FC<PetAppointmentsProps> = ({
           </TableBody>
         </Table>
       ) : (
-        <p className="text-center text-gray-500 mb-4">
-          No appointments scheduled.
-        </p>
+        <div className="mt-4">
+          <p className="text-left text-white         mb-4 px-3 ">
+            No appointments scheduled.
+          </p>
+        </div>
       )}
 
       <Modal

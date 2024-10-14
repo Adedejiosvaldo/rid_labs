@@ -10,10 +10,11 @@ import { useTheme } from "next-themes";
 import Appointment from "./Appointment";
 import AppointmentList from "./appointmentList";
 import VaccinationList from "./VaccinationList";
+import LogoutButton from "@/components/Logout";
 
 const PetOwnersDashboard = () => {
   return (
-    <div>
+    <div className="bg-background">
       <UserWelcome />
       {/* Add Pets */}
       {/* <AddPetCardDashboard /> */}
@@ -25,9 +26,9 @@ const PetOwnersDashboard = () => {
       {/* </div> */}
       {/* My Pets */}
       <Divider className="my-4" />
-      <h1 className="text-2xl font-poppins text-left font-bold mt-4 mb-7">
+      {/* <h1 className="text-2xl font-poppins text-left font-bold mt-4 mb-7">
         My Pets
-      </h1>
+      </h1> */}
       {/* List of pets with details */}
       <PetList />
       <Divider className="my-4" />
@@ -36,6 +37,7 @@ const PetOwnersDashboard = () => {
       {/* List of upcoming appointments */}
       <VaccinationList />
       <Divider className="my-4" />
+      <LogoutButton />
       {/* Access to vaccination records */}
     </div>
   );

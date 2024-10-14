@@ -9,9 +9,7 @@ export const createPetSchema = z.object({
   species: z.enum(["dog", "cat", "bird", "fish", "other"], {
     errorMap: () => ({ message: "Please select a valid pet type." }),
   }),
-
-  age: z.date().max(new Date(), "Pet age cannot be in the future."),
-
+  age: z.date(), // Change to Date type
   breed: z
     .string()
     .min(1, "Pet breed is required and cannot be empty.")

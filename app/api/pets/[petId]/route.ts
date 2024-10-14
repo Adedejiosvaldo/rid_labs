@@ -37,7 +37,6 @@ export async function GET(
   }
 }
 
-
 export async function PATCH(
   request: Request,
   { params }: { params: { petId: string } }
@@ -48,9 +47,9 @@ export async function PATCH(
   const updateData: any = {};
 
   // Only include fields that were actually updated
-  ["name", "age", "description", "imageUrl"].forEach((field) => {
+  ["name", "description", "imageUrl"].forEach((field) => {
     if (body[field] !== undefined) {
-      updateData[field] = field === "age" ? parseInt(body[field]) : body[field];
+      updateData[field] = body[field];
     }
   });
 

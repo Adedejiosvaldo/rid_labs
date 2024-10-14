@@ -187,30 +187,36 @@ const AppointmentList: React.FC = () => {
         Your Appointments
       </h1>
       <div className="hidden md:block">
-        <Table aria-label="Appointments table">
-          <TableHeader>
-            <TableColumn>Date</TableColumn>
-            <TableColumn>Time</TableColumn>
-            <TableColumn>Pet Name</TableColumn>
-            <TableColumn>Reason</TableColumn>
-            <TableColumn>Status</TableColumn>
-          </TableHeader>
-          <TableBody>
-            {appointments.map((appointment) => (
-              <TableRow key={appointment.id}>
-                <TableCell>{appointment.date}</TableCell>
-                <TableCell>{appointment.time}</TableCell>
-                <TableCell>{appointment.petName}</TableCell>
-                <TableCell>{appointment.reason}</TableCell>
-                <TableCell>
-                  <Chip className={getStatusColor(appointment.status)}>
-                    {appointment.status}
-                  </Chip>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {appointments.length > 0 ? (
+          <Table aria-label="Appointments table">
+            <TableHeader>
+              <TableColumn>Date</TableColumn>
+              <TableColumn>Time</TableColumn>
+              <TableColumn>Pet Name</TableColumn>
+              <TableColumn>Reason</TableColumn>
+              <TableColumn>Status</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {appointments.map((appointment) => (
+                <TableRow key={appointment.id}>
+                  <TableCell>{appointment.date}</TableCell>
+                  <TableCell>{appointment.time}</TableCell>
+                  <TableCell>{appointment.petName}</TableCell>
+                  <TableCell>{appointment.reason}</TableCell>
+                  <TableCell>
+                    <Chip className={getStatusColor(appointment.status)}>
+                      {appointment.status}
+                    </Chip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <p className="text-left font-poppins">
+            No vaccination records found.
+          </p>
+        )}
       </div>
       <div className="md:hidden space-y-4">
         {appointments.map((appointment) => (
