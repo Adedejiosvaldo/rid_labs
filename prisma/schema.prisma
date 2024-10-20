@@ -13,6 +13,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model MedicalRecord {
+  id                   String   @id @default(cuid()) @map("_id")
+  history              String
+  clinicalParameters   String
+  diagnosis            String
+  treatment            String
+  recommendations      String
+  nextAppointment      DateTime
+  signature            String
+  pet                  Pet      @relation(fields: [petId], references: [id])
+  petId                String
+}
+
 model Doctor {
   id          String @id @default(cuid()) @map("_id")
   name        String
@@ -69,6 +82,7 @@ model Pet {
   description String?
   appointments Appointment[]
   vaccinations Vaccination[]
+  records MedicalRecord[]
 }
 
 model Vaccination {
