@@ -21,12 +21,20 @@ export async function GET(
   }
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function POST(request: NextRequest) {
   const body = await request.json();
+  const { petId } = body;
+  console.log("Received ID:", petId); // Debugging line
+  console.log("Request Body:", body); // Debugging line
+
+  // Check if the ID is present
+  if (!petId) {
+    console.error("Error: Missing ID parameter");
+    return NextResponse.json(
+      { error: "Missing ID parameter" },
+      { status: 400 }
+    );
+  }
 
   try {
     const newRecord = await prisma.medicalRecord.create({
@@ -38,7 +46,7 @@ export async function POST(
         recommendations: body.recommendations,
         nextAppointment: new Date(body.nextAppointment),
         signature: body.signature,
-        petId: id,
+        petId: petId,
       },
     });
     return NextResponse.json(newRecord, { status: 201 });

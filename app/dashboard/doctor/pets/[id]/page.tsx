@@ -14,7 +14,9 @@ import {
   Input,
   useDisclosure,
 } from "@nextui-org/react";
+import { toast, ToastContainer } from "react-toastify";
 
+import "react-toastify/dist/ReactToastify.css";
 interface MedicalRecord {
   id: string;
   history: string;
@@ -54,51 +56,20 @@ interface Pet {
   medicalRecords?: MedicalRecord[]; // Ensure this is included
 }
 
-// interface MedicalRecord {
-//   id: string;
-//   history: string;
-//   clinicalParameters: string;
-//   diagnosis: string;
-//   treatment: string;
-//   recommendations: string;
-//   nextAppointment: string; // or Date if you want to store it as a Date object
-//   signature: string;
-// }
-// interface Pet {
-//   id: string;
-//   name: string;
-//   species: string;
-//   breed: string;
-//   age: number;
-//   imageUrl?: string;
-//   description?: string;
-//   owner?: {
-//     name: string;
-//     phoneNumber: string;
-//     email: string;
-//   };
-//   vaccinations: Array<{
-//     id: string;
-//     name: string;
-//     date: string;
-//     status: string;
-//   }>;
-//   appointments: Array<{
-//     id: string;
-//     date: string;
-//     reason: string;
-//     status: string;
-//   }>;
-//   medicalRecords?: MedicalRecord[];
-// }
-
 const PetDetails: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const [pet, setPet] = useState<Pet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFormLoading, setIsFormLoading] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isMedicalRecordModalOpen,
+    onOpen: onMedicalRecordModalOpen,
+    onClose: onMedicalRecordModalClose,
+  } = useDisclosure();
+  const { isOpen: isVaccinationModalOpen, onOpen, onClose } = useDisclosure();
   const [newVaccination, setNewVaccination] = useState({ name: "", date: "" });
   const [newRecord, setNewRecord] = useState({
     history: "",
@@ -110,74 +81,46 @@ const PetDetails: React.FC = () => {
     signature: "",
   });
 
-  useEffect(() => {
-    const fetchPetDetails = async () => {
-      try {
-        const response = await fetch(`/api/pets/${params.id}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch pet details");
-        }
-        const data = await response.json();
-        setPet(data);
-
-        // Fetch medical records
-        const recordsResponse = await fetch(`/api/pets/${params.id}/records`);
-        if (!recordsResponse.ok) {
-          throw new Error("Failed to fetch medical records");
-        }
-        const recordsData: MedicalRecord[] = await recordsResponse.json(); // Ensure the records are typed
-        setPet((prevPet) => ({
-          ...(prevPet
-            ? prevPet
-            : {
-                id: "",
-                name: "",
-                species: "",
-                breed: "",
-                age: 0,
-                vaccinations: [],
-                appointments: [],
-                medicalRecords: [],
-                owner: { name: "", phoneNumber: "", email: "" },
-              }),
-          medicalRecords: recordsData,
-        }));
-      } catch (err) {
-        setError("Failed to fetch pet details. Please try again later.");
-        console.error("Error fetching pet details:", err);
-      } finally {
-        setIsLoading(false);
+  const fetchPetDetails = async () => {
+    try {
+      const response = await fetch(`/api/pets/${params.id}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch pet details");
       }
-    };
+      const data = await response.json();
+      setPet(data);
 
-    // const fetchPetDetails = async () => {
-    //   try {
-    //     const response = await fetch(`/api/pets/${params.id}`);
-    //     if (!response.ok) {
-    //       throw new Error("Failed to fetch pet details");
-    //     }
-    //     const data = await response.json();
-    //     setPet(data);
+      // Fetch medical records
+      const recordsResponse = await fetch(`/api/pets/${params.id}/records`);
+      if (!recordsResponse.ok) {
+        throw new Error("Failed to fetch medical records");
+      }
+      const recordsData: MedicalRecord[] = await recordsResponse.json(); // Ensure the records are typed
+      setPet((prevPet) => ({
+        ...(prevPet
+          ? prevPet
+          : {
+              id: "",
+              name: "",
+              species: "",
+              breed: "",
+              age: 0,
+              vaccinations: [],
+              appointments: [],
+              medicalRecords: [],
+              owner: { name: "", phoneNumber: "", email: "" },
+            }),
+        medicalRecords: recordsData,
+      }));
+    } catch (err) {
+      setError("Failed to fetch pet details. Please try again later.");
+      console.error("Error fetching pet details:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    //     // Fetch medical records
-    //     const recordsResponse = await fetch(`/api/pets/${params.id}/records`);
-    //     if (!recordsResponse.ok) {
-    //       throw new Error("Failed to fetch medical records");
-    //     }
-    //     const recordsData: any = await recordsResponse.json(); // Ensure the records are typed
-
-    //     setPet((prevPet) => ({
-    //       ...(prevPet || { medicalRecords: [] }), // Initialize medicalRecords if prevPet is null
-    //       medicalRecords: recordsData, // Update medical records
-    //     }));
-    //   } catch (err) {
-    //     setError("Failed to fetch pet details. Please try again later.");
-    //     console.error("Error fetching pet details:", err);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
-
+  useEffect(() => {
     if (params.id) {
       fetchPetDetails();
     }
@@ -215,28 +158,36 @@ const PetDetails: React.FC = () => {
   };
 
   const handleAddRecord = async () => {
+    setIsFormLoading(true);
     try {
-      const response = await fetch(`/api/pets/${pet?.id}/records`, {
+      console.log("Adding new record for pet ID:", pet?.id); // Debugging line
+      console.log("New Record Data:", newRecord); // Debugging line
+      console.log(params.id);
+
+      const response = await fetch(`/api/pets/${params.id}/records`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...newRecord, // This should include your new record data
-          petId: pet?.id, // Ensure you're including the petId
+          ...newRecord,
+          petId: params.id, // Ensure petId is correctly set
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to add medical record");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add medical record");
       }
 
-      // Refresh pet details
-      const updatedPetResponse = await fetch(`/api/pets/${params.id}`);
-      const updatedPetData = await updatedPetResponse.json();
-      setPet(updatedPetData);
+      onMedicalRecordModalClose();
 
-      onClose();
+      // Refresh pet details
+      const updatedPetResponse = await fetchPetDetails();
+
+      toast.success("Medical record added successfully");
+      router.refresh();
+
       setNewRecord({
         history: "",
         clinicalParameters: "",
@@ -246,11 +197,109 @@ const PetDetails: React.FC = () => {
         nextAppointment: "",
         signature: "",
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error adding medical record:", err);
-      setError("Failed to add medical record. Please try again.");
+
+      if (err instanceof TypeError) {
+        // Network error
+        toast(`
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,`);
+      } else if (err.message?.includes("Failed to add medical record")) {
+        // Server error
+        toast(`
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,`);
+      } else {
+        // Other errors
+        toast(`
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,`);
+      }
+    } finally {
+      setNewRecord({
+        history: "",
+        clinicalParameters: "",
+        diagnosis: "",
+        treatment: "",
+        recommendations: "",
+        nextAppointment: "",
+        signature: "",
+      });
+      setIsFormLoading(false);
     }
   };
+  //   const handleAddRecord = async () => {
+  //     try {
+  //       console.log("Adding new record for pet ID:", pet?.id); // Debugging line
+  //       console.log("New Record Data:", newRecord); // Debugging line
+  //       console.log(params.id);
+  //       const response = await fetch(`/api/pets/${pet?.id}/records`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           ...newRecord,
+  //           //   petId: pet?.id,
+  //           petId: params.id, // Ensure petId is correctly set
+  //         }),
+  //       });
+
+  //       if (!response.ok) {
+  //         throw new Error("Failed to add medical record");
+  //       }
+
+  //       onClose();
+
+  //       // Refresh pet details
+  //       const updatedPetResponse = await fetch(`/api/pets/${params.id}`);
+  //       console.log("Updated Data", await updatedPetResponse.json());
+  //       const updatedPetData = await updatedPetResponse.json();
+  //       setPet(updatedPetData);
+
+  //       toast.success("Medical record added successfully");
+  //       router.refresh();
+
+  //       setNewRecord({
+  //         history: "",
+  //         clinicalParameters: "",
+  //         diagnosis: "",
+  //         treatment: "",
+  //         recommendations: "",
+  //         nextAppointment: "",
+  //         signature: "",
+  //       });
+  //     } catch (err) {
+  //       console.error("Error adding medical record:", err);
+  //       //   onClose();
+
+  //       toast(`
+  //         title: "Error",
+  //         description: "Failed to add medical record. Please try again.",
+  //         status: "error",
+  //         duration: 5000,
+  //         isClosable: true,`);
+  //     }
+  //     setNewRecord({
+  //       history: "",
+  //       clinicalParameters: "",
+  //       diagnosis: "",
+  //       treatment: "",
+  //       recommendations: "",
+  //       nextAppointment: "",
+  //       signature: "",
+  //     });
+  //   };
 
   const navigateToVaccinationDetails = (vaccinationId: string) => {
     router.push(`/dashboard/doctor/vaccinations/${vaccinationId}`);
@@ -262,6 +311,18 @@ const PetDetails: React.FC = () => {
 
   return (
     <div className="p-4">
+      <ToastContainer
+        position="bottom-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <h1 className="text-2xl font-bold mb-4">Pet Details: {pet.name}</h1>
       <Card>
         <CardBody>
@@ -322,6 +383,13 @@ const PetDetails: React.FC = () => {
               <Button color="primary" onClick={onOpen} className="mt-4">
                 Add Vaccination
               </Button>
+              <Button
+                color="primary"
+                onClick={onMedicalRecordModalOpen}
+                className="mt-4"
+              >
+                Add Records
+              </Button>
             </div>
           ) : (
             <div>
@@ -364,7 +432,7 @@ const PetDetails: React.FC = () => {
         </CardBody>
       </Card>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isVaccinationModalOpen} onClose={onClose}>
         <ModalContent>
           <ModalHeader>
             {pet.vaccinations && pet.vaccinations.length > 0
@@ -401,7 +469,10 @@ const PetDetails: React.FC = () => {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal
+        isOpen={isMedicalRecordModalOpen}
+        onClose={onMedicalRecordModalClose}
+      >
         <ModalContent>
           <ModalHeader>Add Medical Record</ModalHeader>
           <ModalBody>
@@ -460,10 +531,14 @@ const PetDetails: React.FC = () => {
             />
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={handleAddRecord}>
+            <Button
+              color="primary"
+              isLoading={isFormLoading}
+              onClick={handleAddRecord}
+            >
               Add Record
             </Button>
-            <Button color="danger" onClick={onClose}>
+            <Button color="danger" onClick={onMedicalRecordModalClose}>
               Cancel
             </Button>
           </ModalFooter>

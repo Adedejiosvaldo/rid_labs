@@ -17,6 +17,7 @@ export async function GET(
       },
       include: {
         vaccinations: true,
+        records: true,
       },
     });
 
