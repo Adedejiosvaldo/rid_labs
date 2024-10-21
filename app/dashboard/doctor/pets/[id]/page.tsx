@@ -238,72 +238,34 @@ const PetDetails: React.FC = () => {
       setIsFormLoading(false);
     }
   };
-  //   const handleAddRecord = async () => {
-  //     try {
-  //       console.log("Adding new record for pet ID:", pet?.id); // Debugging line
-  //       console.log("New Record Data:", newRecord); // Debugging line
-  //       console.log(params.id);
-  //       const response = await fetch(`/api/pets/${pet?.id}/records`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           ...newRecord,
-  //           //   petId: pet?.id,
-  //           petId: params.id, // Ensure petId is correctly set
-  //         }),
-  //       });
 
-  //       if (!response.ok) {
-  //         throw new Error("Failed to add medical record");
-  //       }
+  const calculateAge = (dateOfBirth: string) => {
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
 
-  //       onClose();
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
 
-  //       // Refresh pet details
-  //       const updatedPetResponse = await fetch(`/api/pets/${params.id}`);
-  //       console.log("Updated Data", await updatedPetResponse.json());
-  //       const updatedPetData = await updatedPetResponse.json();
-  //       setPet(updatedPetData);
+    // Adjust for negative days or months
+    if (days < 0) {
+      months--;
+      days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); // Get last day of the previous month
+    }
 
-  //       toast.success("Medical record added successfully");
-  //       router.refresh();
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
 
-  //       setNewRecord({
-  //         history: "",
-  //         clinicalParameters: "",
-  //         diagnosis: "",
-  //         treatment: "",
-  //         recommendations: "",
-  //         nextAppointment: "",
-  //         signature: "",
-  //       });
-  //     } catch (err) {
-  //       console.error("Error adding medical record:", err);
-  //       //   onClose();
-
-  //       toast(`
-  //         title: "Error",
-  //         description: "Failed to add medical record. Please try again.",
-  //         status: "error",
-  //         duration: 5000,
-  //         isClosable: true,`);
-  //     }
-  //     setNewRecord({
-  //       history: "",
-  //       clinicalParameters: "",
-  //       diagnosis: "",
-  //       treatment: "",
-  //       recommendations: "",
-  //       nextAppointment: "",
-  //       signature: "",
-  //     });
-  //   };
+    return { years, months, days };
+  };
 
   const navigateToVaccinationDetails = (vaccinationId: string) => {
     router.push(`/dashboard/doctor/vaccinations/${vaccinationId}`);
   };
+
+  const age = pet?.age ? calculateAge(pet?.age.toString()) : null;
 
   if (isLoading) return <Spinner label="Loading pet details..." />;
   if (error) return <div className="text-red-600">{error}</div>;
@@ -340,7 +302,10 @@ const PetDetails: React.FC = () => {
             <strong>Breed:</strong> {pet.breed}
           </p>
           <p>
-            <strong>Age:</strong> {pet.age}
+            <strong>Age:</strong>{" "}
+            {age
+              ? `${age.years} years, ${age.months} months, ${age.days} days`
+              : "N/A"}
           </p>
           {pet.owner && (
             <>
@@ -380,9 +345,12 @@ const PetDetails: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <Button color="primary" onClick={onOpen} className="mt-4">
-                Add Vaccination
-              </Button>
+              {!pet.vaccinations && (
+                <Button color="primary" onClick={onOpen} className="mt-4">
+                  Add Vaccination
+                </Button>
+              )}
+
               <Button
                 color="primary"
                 onClick={onMedicalRecordModalOpen}
@@ -399,6 +367,7 @@ const PetDetails: React.FC = () => {
               </Button>
             </div>
           )}
+
           <h2 className="text-xl font-bold mt-4 mb-2">Medical Records</h2>
           {pet.medicalRecords && pet.medicalRecords.length > 0 ? (
             <ul>
