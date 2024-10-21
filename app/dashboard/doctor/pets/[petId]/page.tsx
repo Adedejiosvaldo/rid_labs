@@ -13,10 +13,18 @@ import {
   ModalFooter,
   Input,
   useDisclosure,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Chip,
 } from "@nextui-org/react";
 import { toast, ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
+import { MdDelete, MdModeEdit } from "react-icons/md";
 interface MedicalRecord {
   id: string;
   history: string;
@@ -265,6 +273,9 @@ const PetDetails: React.FC = () => {
     router.push(`/dashboard/doctor/vaccinations/${vaccinationId}`);
   };
 
+  const navigateToMedicalRecordDetails = (recordId: string) => {
+    router.push(`/dashboard/doctor/pets/${params.id}/records/${recordId}`);
+  };
   const age = pet?.age ? calculateAge(pet?.age.toString()) : null;
 
   if (isLoading) return <Spinner label="Loading pet details..." />;
@@ -370,6 +381,57 @@ const PetDetails: React.FC = () => {
 
           <h2 className="text-xl font-bold mt-4 mb-2">Medical Records</h2>
           {pet.medicalRecords && pet.medicalRecords.length > 0 ? (
+            <Table aria-label="Medical Records table">
+              <TableHeader>
+                <TableColumn>Date</TableColumn>
+                <TableColumn>History</TableColumn>
+                <TableColumn>Diagnosis</TableColumn>
+                <TableColumn>Next Appointment</TableColumn>
+                <TableColumn>Actions</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {pet.medicalRecords.map((record) => (
+                  <TableRow
+                    onClick={() => console.log("row tappex")}
+                    key={record.id}
+                  >
+                    <TableCell>{record.history}</TableCell>
+                    <TableCell>{record.history}</TableCell>
+                    <TableCell>{record.diagnosis}</TableCell>
+                    {/* <TableCell>{record.treatment}</TableCell> */}
+                    <TableCell>
+                      {new Date(record.nextAppointment).toLocaleDateString()}
+                    </TableCell>
+                    {/* <TableCell>{record.signature}</TableCell> */}
+                    <TableCell>
+                      <button onClick={() => console.log("Hi")}>
+                        <MdModeEdit size={24} />{" "}
+                      </button>
+                      <button
+                        className=" ml-3 mr-7"
+                        onClick={() => console.log("Hi2")}
+                      >
+                        <MdDelete size={24} />{" "}
+                      </button>
+                      <button
+                        className=" ml-3 mr-7"
+                        onClick={() =>
+                          navigateToMedicalRecordDetails(record.id)
+                        }
+                      >
+                        <Chip>View More</Chip>
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p>No medical records found</p>
+          )}
+
+          {/* <h2 className="text-xl font-bold mt-4 mb-2">Medical Records</h2>
+          {pet.medicalRecords && pet.medicalRecords.length > 0 ? (
             <ul>
               {pet.medicalRecords.map((record) => (
                 <li key={record.id} className="mb-2">
@@ -384,7 +446,8 @@ const PetDetails: React.FC = () => {
             </ul>
           ) : (
             <p>No medical records found</p>
-          )}
+          )} */}
+
           <h2 className="text-xl font-bold mt-4 mb-2">Recent Appointments</h2>
           {pet.appointments && pet.appointments.length > 0 ? (
             <ul>
