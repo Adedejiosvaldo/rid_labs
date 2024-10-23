@@ -91,7 +91,7 @@ const PetDetails: React.FC = () => {
 
   const fetchPetDetails = async () => {
     try {
-      const response = await fetch(`/api/pets/${params.id}`);
+      const response = await fetch(`/api/pets/${params.petId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch pet details");
       }
@@ -99,7 +99,7 @@ const PetDetails: React.FC = () => {
       setPet(data);
 
       // Fetch medical records
-      const recordsResponse = await fetch(`/api/pets/${params.id}/records`);
+      const recordsResponse = await fetch(`/api/pets/${params.petId}/records`);
       if (!recordsResponse.ok) {
         throw new Error("Failed to fetch medical records");
       }
@@ -129,10 +129,11 @@ const PetDetails: React.FC = () => {
   };
 
   useEffect(() => {
-    if (params.id) {
+    console.log("params", params.petId);
+    if (params.petId) {
       fetchPetDetails();
     }
-  }, [params.id]);
+  }, [params.petId]);
 
   const handleAddVaccination = async () => {
     try {
@@ -274,7 +275,7 @@ const PetDetails: React.FC = () => {
   };
 
   const navigateToMedicalRecordDetails = (recordId: string) => {
-    router.push(`/dashboard/doctor/pets/${params.id}/records/${recordId}`);
+    router.push(`/dashboard/doctor/pets/${params.petId}/records/${recordId}`);
   };
   const age = pet?.age ? calculateAge(pet?.age.toString()) : null;
 

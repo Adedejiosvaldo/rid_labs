@@ -162,7 +162,7 @@
 
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+
 import {
   Button,
   Input,
@@ -170,10 +170,12 @@ import {
   Spinner,
   CardBody,
   Textarea,
+  Divider,
 } from "@nextui-org/react";
 
 import { toast } from "react-toastify";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
 
 // Define the MedicalRecord interface
 export interface MedicalRecord {
@@ -192,10 +194,11 @@ const MedicalRecordDetail = () => {
   const router = useRouter();
 
   const params = useParams();
-    
+
   const { petId, recordId } = params; // Get both petId and recordId from the query
   const [record, setRecord] = useState<MedicalRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFormLoading, setIsFormLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [updatedFields, setUpdatedFields] = useState<Partial<MedicalRecord>>(
@@ -248,6 +251,7 @@ const MedicalRecordDetail = () => {
 
   const handleSave = async () => {
     if (!record) return; // Ensure record is available
+    setIsFormLoading(true);
     try {
       const response = await fetch(`/api/pets/${petId}/records/${recordId}`, {
         method: "PATCH",
@@ -265,6 +269,8 @@ const MedicalRecordDetail = () => {
       toast.success("Medical record updated successfully!");
     } catch (err: any) {
       toast.error(err.message);
+    } finally {
+      setIsFormLoading(false);
     }
   };
 
@@ -272,79 +278,118 @@ const MedicalRecordDetail = () => {
   if (error) return <p color="error">{error}</p>;
 
   return (
-    <Card>
-      <CardBody>
-        <h2>Medical Record Details</h2>
-        {isEditing ? (
-          <>
-            <Input
-              label="History"
-              name="history"
-              value={updatedFields.history || ""}
-              onChange={handleInputChange}
-            />
-            <Textarea
-              label="Diagnosis"
-              name="diagnosis"
-              value={updatedFields.diagnosis || ""}
-              onChange={handleInputChange}
-            />
-            <Textarea
-              label="Treatment"
-              name="treatment"
-              value={updatedFields.treatment || ""}
-              onChange={handleInputChange}
-            />
-            <Input
-              label="Next Appointment"
-              type="date"
-              name="nextAppointment"
-              value={
-                updatedFields.nextAppointment
-                  ? new Date(updatedFields.nextAppointment)
-                      .toISOString()
-                      .substring(0, 10)
-                  : ""
-              }
-              onChange={(e) =>
-                setUpdatedFields({
-                  ...updatedFields,
-                  nextAppointment: new Date(e.target.value),
-                })
-              }
-            />
-            <Input
-              label="Signature"
-              name="signature"
-              value={updatedFields.signature || ""}
-              onChange={handleInputChange}
-            />
-            <Button onClick={handleSave}>Save Changes</Button>
-            <Button onClick={handleEditToggle}>Cancel</Button>
-          </>
-        ) : (
-          <>
-            <p>
-              <strong>History:</strong> {record?.history}
-            </p>
-            <p>
-              <strong>Diagnosis:</strong> {record?.diagnosis}
-            </p>
-            <p>
-              <strong>Treatment:</strong> {record?.treatment}
-            </p>
-            <p>
-              <strong>Next Appointment:</strong>{" "}
-              {new Date(record!.nextAppointment).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>Signature:</strong> {record?.signature}
-            </p>
-            <Button onClick={handleEditToggle}>Edit</Button>
-          </>
-        )}
-      </CardBody>
-    </Card>
+    <>
+      <button
+        className="flex flex-row  justify-start items-center mb-3"
+        onClick={() => router.back()}
+      >
+        <MdOutlineKeyboardBackspace
+          //   className="bg-white"
+          //   color="black"
+          size={30}
+        />{" "}
+      </button>
+      <Card>
+        <CardBody>
+          <h2 className="font-poppins font-bold text-2xl mb-3">
+            Medical Record Details
+          </h2>
+          {isEditing ? (
+            <>
+              <Input
+                label="History"
+                name="history"
+                className="mt-2 mb-2"
+                value={updatedFields.history || ""}
+                onChange={handleInputChange}
+              />
+              <Textarea
+                label="Diagnosis"
+                name="diagnosis"
+                className="mt-2 mb-2"
+                value={updatedFields.diagnosis || ""}
+                onChange={handleInputChange}
+              />
+              <Textarea
+                label="Treatment"
+                name="treatment"
+                className="mt-2 mb-2"
+                value={updatedFields.treatment || ""}
+                onChange={handleInputChange}
+              />
+              <Input
+                label="Next Appointment"
+                type="date"
+                name="nextAppointment"
+                value={
+                  updatedFields.nextAppointment
+                    ? new Date(updatedFields.nextAppointment)
+                        .toISOString()
+                        .substring(0, 10)
+                    : ""
+                }
+                onChange={(e) =>
+                  setUpdatedFields({
+                    ...updatedFields,
+                    nextAppointment: new Date(e.target.value),
+                  })
+                }
+              />
+              <Input
+                label="Signature"
+                name="signature"
+                className="mt-2 mb-2"
+                value={updatedFields.signature || ""}
+                onChange={handleInputChange}
+              />
+              <Button
+                onClick={handleSave}
+                isLoading={isFormLoading}
+                color="primary"
+                className="mt-2 mb-2"
+              >
+                Save Changes
+              </Button>
+              <Button color="danger" onClick={handleEditToggle}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="mb-3">
+                <strong>History:</strong> {record?.history}
+              </p>
+              <Divider />
+              <p className="mb-3">
+                <strong>Diagnosis:</strong> {record?.diagnosis}
+              </p>
+              <Divider />
+              <p className="mb-3">
+                <strong>Treatment:</strong> {record?.treatment}
+              </p>
+              <Divider />
+              <p className="mb-3">
+                <strong>Next Appointment:</strong>{" "}
+                {new Date(record!.nextAppointment).toLocaleDateString()}
+              </p>
+              <Divider />
+              <p className="mb-3">
+                <strong>Signature:</strong> {record?.signature}
+              </p>
+              <Divider />
+
+              <Button
+                className="mt-3"
+                color="default"
+                onClick={handleEditToggle}
+              >
+                Edit
+              </Button>
+            </>
+          )}
+        </CardBody>
+      </Card>
+    </>
   );
 };
 
