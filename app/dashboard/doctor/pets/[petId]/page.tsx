@@ -24,7 +24,11 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
-import { MdDelete, MdModeEdit } from "react-icons/md";
+import {
+  MdDelete,
+  MdModeEdit,
+  MdOutlineKeyboardBackspace,
+} from "react-icons/md";
 interface MedicalRecord {
   id: string;
   history: string;
@@ -173,14 +177,14 @@ const PetDetails: React.FC = () => {
       console.log("New Record Data:", newRecord); // Debugging line
       console.log(params.id);
 
-      const response = await fetch(`/api/pets/${params.id}/records`, {
+      const response = await fetch(`/api/pets/${params.petId}/records`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...newRecord,
-          petId: params.id, // Ensure petId is correctly set
+          petId: params.petId, // Ensure petId is correctly set
         }),
       });
 
@@ -248,6 +252,59 @@ const PetDetails: React.FC = () => {
     }
   };
 
+  const handleDeleteRecord = async (recordId: string) => {
+    try {
+      const response = await fetch(
+        `/api/pets/${params.petId}/records/${recordId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete medical record");
+      }
+
+      // Refresh pet details
+      await fetchPetDetails();
+
+      toast.success("Medical record deleted successfully");
+      router.refresh();
+    } catch (err: any) {
+      console.error("Error deleting medical record:", err);
+
+      if (err instanceof TypeError) {
+        // Network error
+        toast(
+          ` title: "Network Error",
+          description: "Please check your internet connection and try again.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,`
+        );
+      } else if (err.message?.includes("Failed to delete medical record")) {
+        // Server error
+        toast(
+          ` title: "Server Error",
+          description: err.message,
+          status: "error",
+          duration: 5000,
+          isClosable: true,`
+        );
+      } else {
+        // Other errors
+        toast(
+          ` title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,`
+        );
+      }
+    }
+  };
+
   const calculateAge = (dateOfBirth: string) => {
     const birthDate = new Date(dateOfBirth);
     const today = new Date();
@@ -297,7 +354,17 @@ const PetDetails: React.FC = () => {
         pauseOnHover
         theme="light"
       />
-      <h1 className="text-2xl font-bold mb-4">Pet Details: {pet.name}</h1>
+      <button
+        className="flex flex-row  justify-start items-center mb-3"
+        onClick={() => router.back()}
+      >
+        <MdOutlineKeyboardBackspace
+          //   className="bg-white"
+          //   color="black"
+          size={30}
+        />{" "}
+      </button>
+      <h1 className="text-2xl font-bold mb-4">Patient Details: {pet.name}</h1>
       <Card>
         <CardBody>
           {pet.imageUrl && (
@@ -357,19 +424,6 @@ const PetDetails: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              {!pet.vaccinations && (
-                <Button color="primary" onClick={onOpen} className="mt-4">
-                  Add Vaccination
-                </Button>
-              )}
-
-              <Button
-                color="primary"
-                onClick={onMedicalRecordModalOpen}
-                className="mt-4"
-              >
-                Add Records
-              </Button>
             </div>
           ) : (
             <div>
@@ -379,8 +433,20 @@ const PetDetails: React.FC = () => {
               </Button>
             </div>
           )}
-
+          {!pet.vaccinations && (
+            <Button color="primary" onClick={onOpen} className="mt-4">
+              Add Vaccination
+            </Button>
+          )}
           <h2 className="text-xl font-bold mt-4 mb-2">Medical Records</h2>
+          <Button
+            color="primary"
+            fullWidth={false}
+            onClick={onMedicalRecordModalOpen}
+            className="mt-4"
+          >
+            Add Records
+          </Button>
           {pet.medicalRecords && pet.medicalRecords.length > 0 ? (
             <Table aria-label="Medical Records table">
               <TableHeader>
@@ -405,12 +471,9 @@ const PetDetails: React.FC = () => {
                     </TableCell>
                     {/* <TableCell>{record.signature}</TableCell> */}
                     <TableCell>
-                      <button onClick={() => console.log("Hi")}>
-                        <MdModeEdit size={24} />{" "}
-                      </button>
                       <button
                         className=" ml-3 mr-7"
-                        onClick={() => console.log("Hi2")}
+                        onClick={() => handleDeleteRecord(record.id)}
                       >
                         <MdDelete size={24} />{" "}
                       </button>
