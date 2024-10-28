@@ -14,12 +14,17 @@ export async function PUT(
   }
 
   const { id } = params;
-  const { status, notes, nextDate } = await request.json();
+  const { status, notes, nextDate, imageUrl } = await request.json();
 
   try {
     const updatedVaccination = await prisma.vaccination.update({
       where: { id },
-      data: { status, notes, nextDate: nextDate ? new Date(nextDate) : null },
+      data: {
+        status,
+        notes,
+        nextDate: nextDate ? new Date(nextDate) : null,
+        imageUrl,
+      },
     });
     // If a next date is provided, create a new upcoming vaccination
     if (nextDate) {

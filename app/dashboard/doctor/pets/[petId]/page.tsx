@@ -31,6 +31,7 @@ import {
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
 import SignaturePad from "@/components/SignaturePad";
+import { CldUploadWidget } from "next-cloudinary";
 interface MedicalRecord {
   id: string;
   history: string;
@@ -70,6 +71,12 @@ interface Pet {
   medicalRecords?: MedicalRecord[]; // Ensure this is included
 }
 
+interface CloudinaryResult {
+  info: {
+    secure_url: string;
+  };
+}
+
 const PetDetails: React.FC = () => {
   const params = useParams();
   const router = useRouter();
@@ -84,7 +91,14 @@ const PetDetails: React.FC = () => {
     onClose: onMedicalRecordModalClose,
   } = useDisclosure();
   const { isOpen: isVaccinationModalOpen, onOpen, onClose } = useDisclosure();
-  const [newVaccination, setNewVaccination] = useState({ name: "", date: "" });
+  const [newVaccination, setNewVaccination] = useState({
+    name: "",
+    date: "",
+    imageUrl: "",
+    nextDate: "",
+    notes: "",
+    // Add imageUrl to the state
+  });
   const [newRecord, setNewRecord] = useState({
     history: "",
     clinicalParameters: "",
@@ -141,6 +155,12 @@ const PetDetails: React.FC = () => {
     }
   }, [params.petId]);
 
+  useEffect(() => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split("T")[0]; // Format to YYYY-MM-DD
+    setNewVaccination((prev) => ({ ...prev, date: formattedDate })); // Set the current date
+  }, []);
+
   const handleAddVaccination = async () => {
     try {
       const response = await fetch("/api/vaccinations", {
@@ -153,6 +173,8 @@ const PetDetails: React.FC = () => {
           name: newVaccination.name,
           date: newVaccination.date,
           status: "upcoming",
+          nextDate: newVaccination.nextDate,
+          imageUrl: newVaccination.imageUrl, // Include the image URL
         }),
       });
 
@@ -548,14 +570,81 @@ const PetDetails: React.FC = () => {
                 setNewVaccination({ ...newVaccination, name: e.target.value })
               }
             />
-            <Input
+            <Textarea
+              label="Vaccination Notes"
+              value={newVaccination.notes}
+              onChange={(e) =>
+                setNewVaccination({ ...newVaccination, notes: e.target.value })
+              }
+            />
+            {/* <Input
               type="date"
               label="Vaccination Date"
               value={newVaccination.date}
               onChange={(e) =>
                 setNewVaccination({ ...newVaccination, date: e.target.value })
               }
+            /> */}
+            <Input
+              type="date"
+              label="Next Vaccination Date"
+              value={newVaccination.nextDate} // Ensure this is part of your state
+              onChange={(e) =>
+                setNewVaccination({
+                  ...newVaccination,
+                  nextDate: e.target.value,
+                })
+              }
             />
+
+            {/* <Input
+              type="date"
+              label="Next Vaccination Date"
+              value={newVaccination.nextDate} // Ensure this is part of your state
+              onChange={(e) =>
+                setNewVaccination({
+                  ...newVaccination,
+                  nextDate: e.target.value,
+                })
+              }
+            /> */}
+            <CldUploadWidget
+              uploadPreset="pet_images" // Replace with your Cloudinary upload preset
+              onSuccess={(result) => {
+                console.log("Upload Result:", result); // Add this line for debugging
+                const image_cloud = result as CloudinaryResult;
+                const imageUrl = image_cloud.info.secure_url;
+
+                setNewVaccination((prev) => ({ ...prev, imageUrl })); // Set the image URL in state
+              }}
+              onError={(error) => {
+                console.error("Upload error:", error);
+              }}
+            >
+              {({ open }) => (
+                <Button
+                  onPress={() => {
+                    setNewVaccination((prev) => ({
+                      ...prev,
+                      imageUrl: "     ",
+                    })); // Set the image URL in state
+
+                    // open();
+                    open();
+                  }}
+                  className="mt-4"
+                >
+                  Upload Vaccine Image
+                </Button>
+              )}
+            </CldUploadWidget>
+            {newVaccination.imageUrl && (
+              <img
+                src={newVaccination.imageUrl}
+                alt="Vaccine"
+                className="mt-4"
+              /> // Display the uploaded image
+            )}
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={handleAddVaccination}>
@@ -570,7 +659,7 @@ const PetDetails: React.FC = () => {
         </ModalContent>
       </Modal>
 
-      <Modal
+      {/* <Modal
         isOpen={isMedicalRecordModalOpen}
         onClose={onMedicalRecordModalClose}
       >
@@ -635,7 +724,7 @@ const PetDetails: React.FC = () => {
                 setNewRecord({ ...newRecord, signature: e.target.value })
               }
             /> */}
-          </ModalBody>
+      {/* </ModalBody>
           <ModalFooter>
             <Button
               color="primary"
@@ -648,8 +737,8 @@ const PetDetails: React.FC = () => {
               Cancel
             </Button>
           </ModalFooter>
-        </ModalContent>
-      </Modal>
+        </ModalContent> */}
+      {/* </Modal> */}
     </div>
   );
 };

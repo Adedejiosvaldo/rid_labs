@@ -10,6 +10,7 @@ import {
   Spinner,
 } from "@nextui-org/react";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
+import { CldUploadWidget } from "next-cloudinary";
 
 interface Vaccination {
   id: string /*  */;
@@ -28,6 +29,11 @@ interface Vaccination {
     };
   };
 }
+interface CloudinaryResult {
+  info: {
+    secure_url: string;
+  };
+}
 
 const VaccinationDetails: React.FC = () => {
   const params = useParams();
@@ -37,7 +43,7 @@ const VaccinationDetails: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [nextDate, setNextDate] = useState("");
-
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   useEffect(() => {
     const fetchVaccinationDetails = async () => {
       try {
@@ -53,6 +59,7 @@ const VaccinationDetails: React.FC = () => {
             ? new Date(data.nextDate).toISOString().split("T")[0]
             : ""
         );
+        setImageUrl(data.imageUrl || null); // Set the image URL from the fetched data
       } catch (err) {
         setError(
           "Failed to fetch vaccination details. Please try again later."
@@ -67,7 +74,7 @@ const VaccinationDetails: React.FC = () => {
       fetchVaccinationDetails();
     }
   }, [params.id]);
-
+/*  */
   const handleUpdate = async () => {
     try {
       const response = await fetch(`/api/vaccinations/${params.id}`, {
@@ -79,6 +86,7 @@ const VaccinationDetails: React.FC = () => {
           status: "completed",
           notes,
           nextDate,
+          imageUrl,
         }),
       });
 
@@ -153,6 +161,33 @@ const VaccinationDetails: React.FC = () => {
             onChange={(e) => setNextDate(e.target.value)}
             className="mt-4"
           />
+          <CldUploadWidget
+            uploadPreset="pet_images" // Replace with your Cloudinary upload preset
+            onSuccess={(result) => {
+              console.log("Upload Result:", result); // Add this line for debugging
+              const image_cloud = result as CloudinaryResult;
+              const newImageUrl = image_cloud.info.secure_url;
+
+              setImageUrl(newImageUrl);
+            }}
+            onError={(error) => {
+              console.error("Upload error:", error);
+            }}
+          >
+            {({ open }) => (
+              <Button
+                onClick={() => {
+                  setImageUrl(null);
+                }}
+                className="mt-4"
+              >
+                Upload Vaccine Image
+              </Button>
+            )}
+          </CldUploadWidget>
+          {imageUrl && (
+            <img src={imageUrl} alt="Vaccine" className="mt-4" /> // Display the uploaded image
+          )}
           <Button
             color={isCompleted ? "default" : "primary"}
             onClick={handleUpdate}

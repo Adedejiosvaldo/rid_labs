@@ -42,7 +42,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { petId, name, date, status, notes, nextDate } = await request.json();
+    const { petId, name, date, status, notes, nextDate, imageUrl } =
+      await request.json();
 
     const newVaccination = await prisma.vaccination.create({
       data: {
@@ -51,9 +52,21 @@ export async function POST(request: Request) {
         date: new Date(date),
         status: status || "upcoming",
         notes,
-        nextDate: nextDate ? new Date(nextDate) : null,
+        imageUrl,
+        nextDate: nextDate ? new Date(nextDate) : null, // Ensure nextDate is set correctly
       },
     });
+    // If a next date is provided, create a new upcoming vaccination
+    if (nextDate) {
+      await prisma.vaccination.create({
+        data: {
+          petId,
+          name,
+          date: new Date(nextDate), // Set the next vaccination date
+          status: "upcoming",
+        },
+      });
+    }
 
     return NextResponse.json(newVaccination, { status: 201 });
   } catch (error) {

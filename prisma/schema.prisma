@@ -14,25 +14,24 @@ datasource db {
 }
 
 model MedicalRecord {
-  id                   String   @id @default(cuid()) @map("_id")
-  history              String
-  clinicalParameters   String
-  diagnosis            String
-  treatment            String
-  recommendations      String
-  nextAppointment      DateTime
-  signature            String
-  pet                  Pet      @relation(fields: [petId], references: [id])
-  petId                String
+  id                 String   @id @default(cuid()) @map("_id")
+  history            String
+  clinicalParameters String
+  diagnosis          String
+  treatment          String
+  recommendations    String
+  nextAppointment    DateTime
+  signature          String
+  pet                Pet      @relation(fields: [petId], references: [id])
+  petId              String
 }
 
 model Doctor {
-  id          String @id @default(cuid()) @map("_id")
-  name        String
-  email       String @unique
-  password    String
-  role        String @default("doctor")
-
+  id       String @id @default(cuid()) @map("_id")
+  name     String
+  email    String @unique
+  password String
+  role     String @default("doctor")
 }
 
 model PetOwner {
@@ -56,42 +55,45 @@ model PetOwner {
 // }
 
 model Appointment {
-  id         String   @id @default(cuid()) @map("_id")
-  date       DateTime
-  time       DateTime
-  reason     String
-  status     String   @default("upcoming") // Add this line
-  notes      String?  // Add this line
+  id     String   @id @default(cuid()) @map("_id")
+  date   DateTime
+  time   DateTime
+  reason String
+  status String   @default("upcoming") // Add this line
+  notes  String? // Add this line
 
   petOwner   PetOwner @relation(fields: [petOwnerId], references: [id])
   pet        Pet      @relation(fields: [petId], references: [id])
   petOwnerId String
   petId      String
+
   @@index([petId])
 }
 
 model Pet {
-  id           String        @id @default(cuid()) @map("_id")
-  name         String
-  species      String
-  breed        String
-  age          DateTime
-  imageUrl     String?
-  owner        PetOwner      @relation(fields: [ownerId], references: [id])
-  ownerId      String
+  id          String   @id @default(cuid()) @map("_id")
+  name        String
+  species     String
+  breed       String
+  age         DateTime
+  imageUrl    String?
+  owner       PetOwner @relation(fields: [ownerId], references: [id])
+  ownerId     String
   description String?
+
   appointments Appointment[]
   vaccinations Vaccination[]
-  records MedicalRecord[]
+  records      MedicalRecord[]
 }
 
 model Vaccination {
-  id    String   @id @default(cuid()) @map("_id")
-  name  String
-  date  DateTime
-  status       String   @default("upcoming") // Add this line
-  notes        String?  // Add this line
-  nextDate     DateTime? // Add this line
-  pet   Pet      @relation(fields: [petId], references: [id])
-  petId String
+  id       String   @id @default(cuid()) @map("_id")
+  name     String
+  date     DateTime
+  imageUrl String                    // Add this line for the vaccine image URL
+  status   String    @default("upcoming") // Add this line
+  notes    String? // Add this line
+  nextDate DateTime? // Add this line
+  pet      Pet       @relation(fields: [petId], references: [id])
+  petId    String
 }
