@@ -18,6 +18,7 @@ interface Vaccination {
   name: string;
   date: string;
   status: string;
+  daysUntil: number; // Change to number for better type safety
   pet: {
     name: string;
     owner: {
@@ -32,6 +33,27 @@ const VaccinationList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // const fetchVaccinations = async () => {
+    //   try {
+    //     const response = await fetch("/api/vaccinations");
+    //     if (!response.ok) {
+    //       throw new Error("Failed to fetch vaccinations");
+    //     }
+    //     const data = await response.json();
+
+    //     const formattedVaccinations = data.map((vac: Vaccination) => ({
+    //       ...vac,
+    //       date: new Date(vac.date).toLocaleDateString(),
+    //     }));
+
+    //     setVaccinations(formattedVaccinations);
+    //   } catch (err) {
+    //     setError("Failed to fetch vaccinations. Please try again later.");
+    //     console.error("Error fetching vaccinations:", err);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // };
     const fetchVaccinations = async () => {
       try {
         const response = await fetch("/api/vaccinations");
@@ -40,10 +62,20 @@ const VaccinationList: React.FC = () => {
         }
         const data = await response.json();
 
-        const formattedVaccinations = data.map((vac: Vaccination) => ({
-          ...vac,
-          date: new Date(vac.date).toLocaleDateString(),
-        }));
+        const today = new Date();
+        const formattedVaccinations = data
+          .map((vac: Vaccination) => ({
+            ...vac,
+            date: new Date(vac.date),
+          }))
+          .filter((vac: any) => vac.date > today && vac.status === "upcoming") // Filter for upcoming vaccinations
+          .map((vac: any) => ({
+            ...vac,
+            date: vac.date.toLocaleDateString(),
+            daysUntil: Math.ceil(
+              (vac.date.getTime() - today.getTime()) / (1000 * 3600 * 24)
+            ), // Calculate days until vaccination
+          }));
 
         setVaccinations(formattedVaccinations);
       } catch (err) {
@@ -53,7 +85,6 @@ const VaccinationList: React.FC = () => {
         setIsLoading(false);
       }
     };
-
     fetchVaccinations();
   }, []);
 
@@ -70,7 +101,7 @@ const VaccinationList: React.FC = () => {
           <TableColumn>Date</TableColumn>
           <TableColumn>Vaccination</TableColumn>
           <TableColumn>Pet</TableColumn>
-          <TableColumn>Owner</TableColumn>
+          <TableColumn>Days Until</TableColumn>
           <TableColumn>Status</TableColumn>
           <TableColumn>Actions</TableColumn>
         </TableHeader>
@@ -80,7 +111,8 @@ const VaccinationList: React.FC = () => {
               <TableCell>{vaccination.date}</TableCell>
               <TableCell>{vaccination.name}</TableCell>
               <TableCell>{vaccination.pet.name}</TableCell>
-              <TableCell>{vaccination.pet.owner.name}</TableCell>
+              <TableCell>{vaccination.daysUntil} days</TableCell>
+              {/* Display days until vaccination */}
               <TableCell>
                 <Chip
                   color={
