@@ -211,9 +211,9 @@ const MedicalRecordDetail = () => {
                 {new Date(record!.nextAppointment).toLocaleDateString()}
               </p>
               <Divider />
-              <p className="mb-3">
+              {/* <p className="mb-3">
                 <strong>Signature:</strong> {record?.signature}
-              </p>
+              </p> */}
               <Divider />
 
               <Button

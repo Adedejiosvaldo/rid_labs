@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
   Chip,
+  Textarea,
 } from "@nextui-org/react";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -29,6 +30,7 @@ import {
   MdModeEdit,
   MdOutlineKeyboardBackspace,
 } from "react-icons/md";
+import SignaturePad from "@/components/SignaturePad";
 interface MedicalRecord {
   id: string;
   history: string;
@@ -356,7 +358,7 @@ const PetDetails: React.FC = () => {
       />
       <button
         className="flex flex-row  justify-start items-center mb-3"
-        onClick={() => router.back()}
+        onClick={() => router.push("/dashboard/doctor")}
       >
         <MdOutlineKeyboardBackspace
           //   className="bg-white"
@@ -442,7 +444,10 @@ const PetDetails: React.FC = () => {
           <Button
             color="primary"
             fullWidth={false}
-            onClick={onMedicalRecordModalOpen}
+            onClick={() =>
+              router.push(`/dashboard/doctor/pets/${params.petId}/records/new`)
+            } // Navigate to the new page
+            // onClick={onMedicalRecordModalOpen}
             className="mt-4"
           >
             Add Records
@@ -579,7 +584,7 @@ const PetDetails: React.FC = () => {
                 setNewRecord({ ...newRecord, history: e.target.value })
               }
             />
-            <Input
+            <Textarea
               label="Clinical Parameters"
               value={newRecord.clinicalParameters}
               onChange={(e) =>
@@ -589,21 +594,21 @@ const PetDetails: React.FC = () => {
                 })
               }
             />
-            <Input
+            <Textarea
               label="Diagnosis"
               value={newRecord.diagnosis}
               onChange={(e) =>
                 setNewRecord({ ...newRecord, diagnosis: e.target.value })
               }
             />
-            <Input
+            <Textarea
               label="Treatment"
               value={newRecord.treatment}
               onChange={(e) =>
                 setNewRecord({ ...newRecord, treatment: e.target.value })
               }
             />
-            <Input
+            <Textarea
               label="Recommendations"
               value={newRecord.recommendations}
               onChange={(e) =>
@@ -618,13 +623,18 @@ const PetDetails: React.FC = () => {
                 setNewRecord({ ...newRecord, nextAppointment: e.target.value })
               }
             />
-            <Input
+            <SignaturePad
+              onChange={(signature) =>
+                setNewRecord({ ...newRecord, signature })
+              }
+            />
+            {/* <Input
               label="Signature"
               value={newRecord.signature}
               onChange={(e) =>
                 setNewRecord({ ...newRecord, signature: e.target.value })
               }
-            />
+            /> */}
           </ModalBody>
           <ModalFooter>
             <Button

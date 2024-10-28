@@ -8,13 +8,13 @@ import { Divider } from "@nextui-org/react";
 const DoctorsDashboard = () => {
   return (
     <div className=" h-screen">
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 flex-col overflow-y-auto p-4">
         <AppointmentList />
-      </div>
-      <div className="flex-1 overflow-y-auto p-4">
+        {/* <div className="flex-1 overflow-y-auto p-4"> */}
         <VaccinationList />
-        <Divider />
+        {/* <Divider /> */}
         <PetList />
+        {/* </div> */}
       </div>
       <LogoutButton />
     </div>

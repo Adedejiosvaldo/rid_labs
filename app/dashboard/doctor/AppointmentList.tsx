@@ -107,7 +107,11 @@ const DoctorAppointmentList: React.FC = () => {
     }
   };
 
-  if (isLoading) return <Spinner label="Loading appointments..." />;
+  if (isLoading)
+    return (
+      <Spinner className="mb-3 mt-3" label="Loading Doctors Dashboard..." />
+    );
+
   if (error) return <div className="text-red-600">{error}</div>;
 
   const getStatusColor = (status: Appointment["status"]) => {
