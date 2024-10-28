@@ -9,9 +9,10 @@ import {
   Textarea,
   Spinner,
 } from "@nextui-org/react";
+import { MdOutlineKeyboardBackspace } from "react-icons/md";
 
 interface Vaccination {
-  id: string;
+  id: string /*  */;
   name: string;
   date: string;
   status: string;
@@ -99,9 +100,19 @@ const VaccinationDetails: React.FC = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Vaccination Details</h1>
+      <button
+        className="flex flex-row  justify-start items-center mb-3"
+        onClick={() => router.push("/dashboard/doctor")}
+      >
+        <MdOutlineKeyboardBackspace
+          //   className="bg-white"
+          //   color="black"
+          size={30}
+        />{" "}
+      </button>
       <Card>
         <CardBody>
-          <p>
+          {/* <p>
             <strong>Vaccination:</strong> {vaccination.name}
           </p>
           <p>
@@ -122,7 +133,34 @@ const VaccinationDetails: React.FC = () => {
           </p>
           <p>
             <strong>Owner:</strong> {vaccination.pet.owner.name}
-          </p>
+          </p> */}
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <strong>Vaccination:</strong> {vaccination.name}
+            </div>
+            <div>
+              <strong>Date:</strong>{" "}
+              {new Date(vaccination.date).toLocaleDateString()}
+            </div>
+            <div>
+              <strong>Pet:</strong> {vaccination.pet.name}
+            </div>
+            <div>
+              <strong>Species:</strong> {vaccination.pet.species}
+            </div>
+            <div>
+              <strong>Breed:</strong> {vaccination.pet.breed}
+            </div>
+            <div>
+              <strong>Age:</strong>{" "}
+              {new Date(vaccination.pet.age).toLocaleDateString()}{" "}
+              {/* Assuming age is a date */}
+            </div>
+            <div>
+              <strong>Owner:</strong> {vaccination.pet.owner.name}
+            </div>
+          </div>
           <Textarea
             label="Notes"
             value={notes}
