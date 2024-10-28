@@ -3,13 +3,13 @@ import prisma from "@/prisma/db"; // Adjust the import based on your project str
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { petId: string } }
 ) {
-  const { id } = params;
+  const { petId } = params;
 
   try {
     const records = await prisma.medicalRecord.findMany({
-      where: { petId: id },
+      where: { petId: petId },
     });
     return NextResponse.json(records);
   } catch (error) {

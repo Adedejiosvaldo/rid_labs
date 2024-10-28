@@ -496,7 +496,7 @@ const PetDetails: React.FC = () => {
               </TableBody>
             </Table>
           ) : (
-            <p>No medical records found</p>
+            <p className="mt-3 mb-3">No medical records found</p>
           )}
 
           {/* <h2 className="text-xl font-bold mt-4 mb-2">Medical Records</h2>
