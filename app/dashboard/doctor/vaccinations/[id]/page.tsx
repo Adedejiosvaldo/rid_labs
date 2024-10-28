@@ -96,6 +96,8 @@ const VaccinationDetails: React.FC = () => {
   if (isLoading) return <Spinner label="Loading vaccination details..." />;
   if (error) return <div className="text-red-600">{error}</div>;
   if (!vaccination) return <div>No vaccination found</div>;
+  const isCompleted =
+    vaccination.status === "completed" || vaccination.status === "ended";
 
   return (
     <div className="p-4">
@@ -112,29 +114,6 @@ const VaccinationDetails: React.FC = () => {
       </button>
       <Card>
         <CardBody>
-          {/* <p>
-            <strong>Vaccination:</strong> {vaccination.name}
-          </p>
-          <p>
-            <strong>Date:</strong>{" "}
-            {new Date(vaccination.date).toLocaleDateString()}
-          </p>
-          <p>
-            <strong>Pet:</strong> {vaccination.pet.name}
-          </p>
-          <p>
-            <strong>Species:</strong> {vaccination.pet.species}
-          </p>
-          <p>
-            <strong>Breed:</strong> {vaccination.pet.breed}
-          </p>
-          <p>
-            <strong>Age:</strong> {vaccination.pet.age}
-          </p>
-          <p>
-            <strong>Owner:</strong> {vaccination.pet.owner.name}
-          </p> */}
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <strong>Vaccination:</strong> {vaccination.name}
@@ -174,8 +153,13 @@ const VaccinationDetails: React.FC = () => {
             onChange={(e) => setNextDate(e.target.value)}
             className="mt-4"
           />
-          <Button color="primary" onClick={handleUpdate} className="mt-4">
-            Complete Vaccination
+          <Button
+            color={isCompleted ? "default" : "primary"}
+            onClick={handleUpdate}
+            disabled={isCompleted} // Disable button if completed or ended
+            className="mt-4"
+          >
+            {isCompleted ? "Vaccinated" : "Complete Vaccination"}
           </Button>
         </CardBody>
       </Card>
