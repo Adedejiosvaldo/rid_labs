@@ -162,6 +162,7 @@ const PetDetails: React.FC = () => {
   }, []);
 
   const handleAddVaccination = async () => {
+    setIsFormLoading(true);
     try {
       const response = await fetch("/api/vaccinations", {
         method: "POST",
@@ -172,7 +173,7 @@ const PetDetails: React.FC = () => {
           petId: pet?.id,
           name: newVaccination.name,
           date: newVaccination.date,
-          status: "upcoming",
+          status: "completed",
           nextDate: newVaccination.nextDate,
           imageUrl: newVaccination.imageUrl, // Include the image URL
         }),
@@ -182,20 +183,22 @@ const PetDetails: React.FC = () => {
         throw new Error("Failed to add vaccination");
       }
 
-      //   // Refresh pet details
-      //   const updatedPetResponse = await fetch(`/api/pets/${params.id}`);
-      //   const updatedPetData = await updatedPetResponse.json();
-      //   setPet(updatedPetData);
-
       onClose();
-    } catch (err) {
+      toast.success("Medical record added successfully");
+      //   router.refresh();
+      //   router.refresh();
+      location.reload();
+    } catch (err) {                                     
       console.error("Error adding vaccination:", err);
       setError("Failed to add vaccination. Please try again.");
+      toast(`
+        description: "An unexpected error occurred. Please try again.`);
+    } finally {
+      setIsFormLoading(false);
     }
   };
 
   const handleAddRecord = async () => {
-    setIsFormLoading(true);
     try {
       console.log("Adding new record for pet ID:", pet?.id); // Debugging line
       console.log("New Record Data:", newRecord); // Debugging line
@@ -647,9 +650,13 @@ const PetDetails: React.FC = () => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={handleAddVaccination}>
+            <Button
+              color="primary"
+              isLoading={isFormLoading}
+              onClick={handleAddVaccination}
+            >
               {pet.vaccinations && pet.vaccinations.length > 0
-                ? "Add Vaccination"
+                ? "Add Vaccinati    on"
                 : "Start Vaccination"}
             </Button>
             <Button color="danger" onClick={onClose}>

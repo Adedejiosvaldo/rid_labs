@@ -90,9 +90,9 @@ model Vaccination {
   id       String   @id @default(cuid()) @map("_id")
   name     String
   date     DateTime
-  imageUrl String                    // Add this line for the vaccine image URL
   status   String    @default("upcoming") // Add this line
   notes    String? // Add this line
+  imageUrl String                               // Add this line for the vaccine image URL
   nextDate DateTime? // Add this line
   pet      Pet       @relation(fields: [petId], references: [id])
   petId    String
