@@ -18,6 +18,7 @@ interface Vaccination {
   name: string;
   date: string;
   status: string;
+  imageUrl: string;
   daysUntil: number; // Change to number for better type safety
   pet: {
     name: string;

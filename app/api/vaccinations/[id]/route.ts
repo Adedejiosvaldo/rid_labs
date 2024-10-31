@@ -35,6 +35,7 @@ export async function PUT(
           date: new Date(nextDate),
           status: "upcoming",
           imageUrl: "",
+          notes: "",
         },
       });
     }
