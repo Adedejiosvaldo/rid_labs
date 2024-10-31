@@ -34,6 +34,7 @@ export async function PUT(
           name: updatedVaccination.name,
           date: new Date(nextDate),
           status: "upcoming",
+          imageUrl: "",
         },
       });
     }
