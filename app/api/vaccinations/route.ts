@@ -62,6 +62,7 @@ export async function POST(request: Request) {
         data: {
           petId,
           name,
+          imageUrl: "",
           date: new Date(nextDate), // Set the next vaccination date
           status: "upcoming",
         },
