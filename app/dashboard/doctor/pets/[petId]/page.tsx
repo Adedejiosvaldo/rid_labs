@@ -188,7 +188,7 @@ const PetDetails: React.FC = () => {
       //   router.refresh();
       //   router.refresh();
       location.reload();
-    } catch (err) {                                     
+    } catch (err) {
       console.error("Error adding vaccination:", err);
       setError("Failed to add vaccination. Please try again.");
       toast(`
@@ -614,7 +614,6 @@ const PetDetails: React.FC = () => {
             <CldUploadWidget
               uploadPreset="pet_images" // Replace with your Cloudinary upload preset
               onSuccess={(result) => {
-                console.log("Upload Result:", result); // Add this line for debugging
                 const image_cloud = result as CloudinaryResult;
                 const imageUrl = image_cloud.info.secure_url;
 

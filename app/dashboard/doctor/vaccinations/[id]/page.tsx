@@ -74,7 +74,7 @@ const VaccinationDetails: React.FC = () => {
       fetchVaccinationDetails();
     }
   }, [params.id]);
-/*  */
+  /*  */
   const handleUpdate = async () => {
     try {
       const response = await fetch(`/api/vaccinations/${params.id}`, {
@@ -164,7 +164,6 @@ const VaccinationDetails: React.FC = () => {
           <CldUploadWidget
             uploadPreset="pet_images" // Replace with your Cloudinary upload preset
             onSuccess={(result) => {
-              console.log("Upload Result:", result); // Add this line for debugging
               const image_cloud = result as CloudinaryResult;
               const newImageUrl = image_cloud.info.secure_url;
 
@@ -178,6 +177,8 @@ const VaccinationDetails: React.FC = () => {
               <Button
                 onClick={() => {
                   setImageUrl(null);
+                  // open();
+                  open();
                 }}
                 className="mt-4"
               >
